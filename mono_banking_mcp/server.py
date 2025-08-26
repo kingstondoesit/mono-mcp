@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Mono Banking MCP Server using FastMCP.
 
