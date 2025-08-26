@@ -10,25 +10,35 @@ from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 import uvicorn
 from dotenv import load_dotenv
+from .database import MonoBankingDB
 
 load_dotenv()
 
 app = FastAPI(title="Mono Banking Webhooks", version="1.0.0")
+db = MonoBankingDB()
 
-WEBHOOK_SECRET = os.getenv("MONO_WEBHOOK_SECRET", "")
+# get webhook secret from environment
+WEBHOOK_SECRET = os.getenv("MONO_WEBHOOK_SECRET")
 
 def verify_webhook_signature(payload: bytes, signature: str) -> bool:
-    """verify webhook signature using HMAC-SHA256"""
-    if not WEBHOOK_SECRET:
-        return False
-    
-    expected_signature = hmac.new(
-        WEBHOOK_SECRET.encode(),
-        payload,
-        hashlib.sha256
-    ).hexdigest()
-    
-    return hmac.compare_digest(signature, expected_signature)
+     """verify webhook signature using HMAC-SHA256"""
+     if not WEBHOOK_SECRET:
+         return False
+     
+     if not signature:
+         return False
+     
+     expected_signature = hmac.new(
+         WEBHOOK_SECRET.encode(),
+         payload,
+         hashlib.sha256
+     ).hexdigest()
+     
+     # Ensure both signatures are the same length to prevent timing attacks
+     if len(signature) != len(expected_signature):
+         return False
+     
+     return hmac.compare_digest(signature, expected_signature)
 
 @app.post("/mono/webhook")
 async def handle_webhook(request: Request):
@@ -84,10 +94,21 @@ async def handle_account_connected(data: Dict[str, Any]):
     """handle account connection event"""
     account_id = data.get("id")
     customer_id = data.get("customer")
-    
-    print(f"account connected: {account_id} for customer: {customer_id}")
-    # store account_id in your database
-    # trigger any post-connection workflows
+
+    # store account in database
+    account_data = {
+        "id": account_id,
+        "customer_id": customer_id,
+        "status": "connected"
+    }
+
+    if db.store_account(account_data):
+        print(f"account connected and stored: {account_id}")
+    else:
+        print(f"failed to store account: {account_id}")
+
+    # store webhook event
+    db.store_webhook_event("account_connected", account_id, data)
 
 async def handle_account_updated(data: Dict[str, Any]):
     """handle account update event"""
@@ -95,28 +116,44 @@ async def handle_account_updated(data: Dict[str, Any]):
     account_id = account_info.get("id")
     meta = data.get("meta", {})
     data_status = meta.get("data_status")
-    
+
+    # update account status in database
+    existing_account = db.get_account(account_id)
+    if existing_account:
+        existing_account.update({
+            "status": data_status,
+            "bank_name": account_info.get("institution", {}).get("name"),
+            "bank_code": account_info.get("institution", {}).get("bankCode")
+        })
+        db.store_account(existing_account)
+
     print(f"account updated: {account_id}, status: {data_status}")
-    # update account status in your database
-    # trigger data refresh if needed
+    db.store_webhook_event("account_updated", account_id, data)
 
 async def handle_account_unlinked(data: Dict[str, Any]):
     """handle account unlink event"""
     account_info = data.get("account", {})
     account_id = account_info.get("id")
-    
-    print(f"account unlinked: {account_id}")
-    # remove account from your database
-    # clean up related data
+
+    # remove account from database
+    if db.remove_account(account_id):
+        print(f"account unlinked and removed: {account_id}")
+    else:
+        print(f"failed to remove account: {account_id}")
+
+    db.store_webhook_event("account_unlinked", account_id, data)
 
 async def handle_job_update(data: Dict[str, Any]):
     """handle job status update"""
     account_id = data.get("account")
     job_status = data.get("status")
-    
+
     print(f"job update for account {account_id}: {job_status}")
-    # update job status in your system
-    # trigger next steps if job finished
+    db.store_webhook_event("job_update", account_id, data)
+
+    # trigger data refresh if job finished
+    if job_status == "finished":
+        print(f"job finished for account {account_id} - ready for data sync")
 
 @app.get("/health")
 async def health_check():
