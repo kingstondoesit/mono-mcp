@@ -4,21 +4,16 @@ Mono Banking MCP Server using FastMCP.
 
 A simple MCP server for Nigerian banking operations via the Mono Open Banking API.
 """
-
 import os
 
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
-
 from mono_banking_mcp.mono_client import MonoClient
 
-# Load environment variables
 load_dotenv()
 
-# Create FastMCP server
 mcp = FastMCP("Mono Banking")
 
-# Initialize Mono client
 mono_client = MonoClient(
     secret_key=os.getenv("MONO_SECRET_KEY", ""),
     base_url=os.getenv("MONO_BASE_URL", "https://api.withmono.com")

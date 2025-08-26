@@ -4,13 +4,11 @@ from typing import Any
 
 import httpx
 
-
 class MonoClient:
     """
     Mono Open Banking API client following the official Mono API v2 specification.
     Based on Mono's official documentation and API patterns.
     """
-
     def __init__(self, secret_key: str, base_url: str = "https://api.withmono.com"):
         """
         Initialize Mono client with secret key for API authentication.
@@ -23,7 +21,7 @@ class MonoClient:
         self.base_url = base_url
         self.session = httpx.AsyncClient(
             headers={
-                "mono-sec-key": secret_key,  # Correct header name per Mono docs
+                "mono-sec-key": secret_key,
                 "accept": "application/json",
                 "content-type": "application/json",
                 "User-Agent": "Mono-Banking-MCP/1.0"
@@ -157,7 +155,6 @@ class MonoClient:
         if not reference:
             reference = f"MCP-{uuid.uuid4().hex[:8]}-{int(datetime.now().timestamp())}"
 
-        # Amount in kobo (multiply by 100)
         amount_kobo = int(amount * 100)
 
         payload = {
@@ -213,13 +210,12 @@ class MonoClient:
             "bank_code": bank_code
         }
 
-        # Try the banks resolve endpoint as mentioned in the guide
         try:
             response = await self.session.post(f"{self.base_url}/misc/banks/resolve", json=payload)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError:
-            # Fallback to alternative endpoint if available
+            
             response = await self.session.post(f"{self.base_url}/v2/misc/banks/resolve", json=payload)
             response.raise_for_status()
             return response.json()
