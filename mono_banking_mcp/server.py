@@ -2,7 +2,7 @@
 import os
 
 from dotenv import load_dotenv
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from mono_banking_mcp.mono_client import MonoClient
 
 load_dotenv()
@@ -16,7 +16,11 @@ mono_client = MonoClient(
 
 @mcp.tool()
 async def list_linked_accounts() -> dict:
-    """List all bank accounts linked to your Mono app."""
+    """List Linked Accounts
+    
+    Retrieves and displays a list of all external accounts 
+    linked to the user's profile for review.
+    """
     try:
         result = await mono_client.get_customer_accounts()
 
@@ -345,7 +349,10 @@ async def initiate_account_linking(
     customer_email: str,
     redirect_url: str = "https://mono.co"
 ) -> dict:
-    """Initiate account linking process for a customer (returns mono_url for authorization)."""
+    """Initiate Account Linking
+    
+    Initiates account linking process for a customer (returns mono_url for authorization).
+    """
     try:
         result = await mono_client.initiate_account_linking(
             customer_name=customer_name,

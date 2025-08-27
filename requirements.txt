@@ -1,4 +1,4 @@
-mcp[cli]
+fastmcp==2.11.3
 httpx>=0.25.0
 python-dotenv>=1.0.0
 fastapi>=0.104.0
