@@ -2,30 +2,21 @@
 
 A comprehensive **Model Context Protocol (MCP)** server for Nigerian banking operations using the [Mono Open Banking API](https://mono.co).
 
-## 🚀 Key Features
+## � Table of Contents
 
-### 🏦 Core Banking Operations
-- **Account Management**: Link and manage Nigerian bank accounts via Mono Connect
-- **Real-time Balances**: Get current account balances in Nigerian Naira (₦)
-- **Account Information**: Retrieve detailed account information and metadata
-- **Transaction History**: Access paginated transaction records with filtering options
+- [Key Features](#-key-features)
+- [Architecture](#-architecture)
+- [Technologies Used](#️-technologies-used)
+- [Project Structure](#-project-structure)
+- [Installation and Setup](#-installation-and-setup)
+- [Usage](#-usage)
+- [Available Banking Tools](#️-available-banking-tools)
+- [Development](#-development)
+- [Contributing](#-contributing)
 
-### 💸 Payment & Verification
-- **Payment Processing**: Initiate payments using Mono DirectPay with customer details
-- **Payment Verification**: Track and verify payment status using payment references
-- **Account Verification**: Verify recipient account names before processing payments
-- **Bank Directory**: Access complete list of supported Nigerian banks with codes
+## �🚀 Key Features
 
-### 🔍 Identity & Security
-- **BVN Lookup**: Bank Verification Number (BVN) identity verification and validation
-- **Webhook Support**: Real-time event handling with signature verification for production use
-- **Secure Authentication**: Built-in security using Mono's API keys and HMAC-SHA256 verification
-- **Database Integration**: Persistent storage for webhook events and transaction records
-
-### 🤖 AI Integration
-- **MCP Protocol**: Native Model Context Protocol support for seamless AI assistant integration
-- **Natural Language Interface**: Optimized for conversational banking with Claude, Gemini, and other AI assistants
-- **FastMCP Framework**: Built with modern async Python and decorators for high performance
+Complete Nigerian banking operations through AI assistants with account management, real-time payments, BVN verification, and secure webhook integration via the Model Context Protocol (MCP).
 
 ## 📊 Architecture
 
