@@ -82,7 +82,7 @@ sequenceDiagram
 mono-banking-mcp/
 ├── mono_banking_mcp/           # Main package
 │   ├── __init__.py            # Package initialization
-│   ├── server.py              # FastMCP server with 11 banking tools
+│   ├── server.py              # FastMCP server with comprehensive banking tools
 │   ├── mono_client.py         # Mono API client with httpx
 │   ├── webhook_server.py      # FastAPI webhook server for real-time events
 │   └── database.py            # SQLite database for webhook events storage
