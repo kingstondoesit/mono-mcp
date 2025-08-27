@@ -1,8 +1,7 @@
 import uuid
+import httpx
 from datetime import datetime
 from typing import Any
-
-import httpx
 
 class MonoClient:
     """
