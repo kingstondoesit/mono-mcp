@@ -1,8 +1,7 @@
 import uuid
+import httpx
 from datetime import datetime
 from typing import Any
-
-import httpx
 
 class MonoClient:
     """
@@ -236,6 +235,38 @@ class MonoClient:
             response = await self.session.get(f"{self.base_url}/v2/misc/banks")
             response.raise_for_status()
             return response.json()
+
+    async def lookup_bvn(self, bvn: str, scope: str = "identity") -> dict[str, Any]:
+        """
+        Lookup BVN information for identity verification.
+
+        Args:
+            bvn: Bank Verification Number (11 digits)
+            scope: "identity" for basic info, "bank_accounts" for linked accounts
+
+        Returns:
+            Dict with BVN verification results
+        """
+        payload = {"bvn": bvn, "scope": scope}
+        response = await self.session.post(f"{self.base_url}/v2/lookup/bvn/initiate", json=payload)
+        response.raise_for_status()
+        return response.json()
+
+    async def lookup_account_number(self, account_number: str, nip_code: str) -> dict[str, Any]:
+        """
+        Lookup account number to get masked BVN and verification.
+
+        Args:
+            account_number: 10-digit account number
+            nip_code: Bank's NIP code (3 digits)
+
+        Returns:
+            Dict with account verification and masked BVN
+        """
+        payload = {"account_number": account_number, "nip_code": nip_code}
+        response = await self.session.post(f"{self.base_url}/v3/lookup/account-number", json=payload)
+        response.raise_for_status()
+        return response.json()
 
     async def close(self):
         """Close the HTTP session."""
