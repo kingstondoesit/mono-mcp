@@ -88,8 +88,6 @@ mono-banking-mcp/
 │   └── database.py            # SQLite database for webhook events storage
 ├── tests/                     # Test suite
 │   └── test_mono_banking.py   # Unit tests for MCP tools
-├── docs/                      # Documentation and guides
-│   └── *.md                   # Additional documentation files
 ├── .vscode/                   # VS Code configuration
 │   └── settings.json          # Editor settings for development
 ├── requirements.txt           # Python dependencies
