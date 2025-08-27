@@ -4,14 +4,28 @@ A comprehensive **Model Context Protocol (MCP)** server for Nigerian banking ope
 
 ## 🚀 Key Features
 
+### 🏦 Core Banking Operations
 - **Account Management**: Link and manage Nigerian bank accounts via Mono Connect
 - **Real-time Balances**: Get current account balances in Nigerian Naira (₦)
-- **Payment Processing**: Initiate payments using Mono DirectPay
-- **Transaction History**: Retrieve detailed account transaction records
-- **Account Verification**: Verify recipient account names before payments
+- **Account Information**: Retrieve detailed account information and metadata
+- **Transaction History**: Access paginated transaction records with filtering options
+
+### 💸 Payment & Verification
+- **Payment Processing**: Initiate payments using Mono DirectPay with customer details
+- **Payment Verification**: Track and verify payment status using payment references
+- **Account Verification**: Verify recipient account names before processing payments
 - **Bank Directory**: Access complete list of supported Nigerian banks with codes
-- **Voice Banking Ready**: Optimized for integration with Gemini Live and AI assistants
-- **Secure Authentication**: Built-in security using Mono's API keys and webhook verification
+
+### 🔍 Identity & Security
+- **BVN Lookup**: Bank Verification Number (BVN) identity verification and validation
+- **Webhook Support**: Real-time event handling with signature verification for production use
+- **Secure Authentication**: Built-in security using Mono's API keys and HMAC-SHA256 verification
+- **Database Integration**: Persistent storage for webhook events and transaction records
+
+### 🤖 AI Integration
+- **MCP Protocol**: Native Model Context Protocol support for seamless AI assistant integration
+- **Natural Language Interface**: Optimized for conversational banking with Claude, Gemini, and other AI assistants
+- **FastMCP Framework**: Built with modern async Python and decorators for high performance
 
 ## 🏗️ Architecture
 
@@ -68,16 +82,22 @@ sequenceDiagram
 mono-banking-mcp/
 ├── mono_banking_mcp/           # Main package
 │   ├── __init__.py            # Package initialization
-│   ├── server.py              # FastMCP server with tools
-│   └── mono_client.py         # Mono API client
+│   ├── server.py              # FastMCP server with comprehensive banking tools
+│   ├── mono_client.py         # Mono API client with httpx
+│   ├── webhook_server.py      # FastAPI webhook server for real-time events
+│   └── database.py            # SQLite database for webhook events storage
 ├── tests/                     # Test suite
-│   └── test_mono_banking.py   # Unit tests
-├── docs/                      # Documentation
-├── requirements.txt          # Dependencies
-├── claude_desktop_config.json # Claude Desktop integration
-├── .env.example              # Environment template
-├── .gitignore                # Git ignore rules
-└── README.md                 # This file
+│   └── test_mono_banking.py   # Unit tests for MCP tools
+├── docs/                      # Documentation and guides
+│   └── *.md                   # Additional documentation files
+├── .vscode/                   # VS Code configuration
+│   └── settings.json          # Editor settings for development
+├── requirements.txt           # Python dependencies
+├── pyproject.toml            # Modern Python project configuration
+├── claude_desktop_config.json # Claude Desktop MCP integration
+├── .env.example              # Environment variables template
+├── .gitignore                # Git ignore rules and build artifacts
+└── README.md                 # This comprehensive documentation
 ```
 
 ## 📦 Installation and Setup
