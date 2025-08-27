@@ -27,7 +27,7 @@ A comprehensive **Model Context Protocol (MCP)** server for Nigerian banking ope
 - **Natural Language Interface**: Optimized for conversational banking with Claude, Gemini, and other AI assistants
 - **FastMCP Framework**: Built with modern async Python and decorators for high performance
 
-## 🏗️ Architecture
+## 📊 Architecture
 
 ```mermaid
 sequenceDiagram
@@ -76,7 +76,7 @@ sequenceDiagram
 - **python-dotenv** - Environment variable management
 - **uv** - Fast Python package manager (recommended)
 
-## 🏗️ Project Structure
+## 📁 Project Structure
 
 ```
 mono-banking-mcp/
@@ -277,140 +277,28 @@ mypy mono_banking_mcp/
 
 ## 🤝 Contributing
 
-We welcome contributions to the Mono Banking MCP Server! Here's how to get started:
+We welcome contributions to the Mono Banking MCP Server! Please see our [Contributing Guide](CONTRIBUTING.md) for detailed information on:
 
-### 📋 Prerequisites
+- 🚀 Development setup and environment configuration
+- 🔧 Making changes and development workflow  
+- 🧪 Testing requirements and best practices
+- 📤 Submitting pull requests and code review process
+- 📝 Issue guidelines for bugs and feature requests
 
-- Python 3.12+
-- Git
-- Mono API credentials (for testing)
-- Basic knowledge of MCP protocol and async Python
+Whether you're fixing bugs, adding features, or improving documentation, we appreciate your help in making this project better!
 
-### 🚀 Getting Started
+**Quick Start for Contributors:**
+```bash
+# Fork and clone the repository
+git clone https://github.com/YOUR_USERNAME/mono-mcp.git
+cd mono-mcp
 
-1. **Fork the Repository**
-   ```bash
-   # Click "Fork" on GitHub to create your copy
-   # https://github.com/sin4ch/mono-mcp/fork
-   ```
+# Set up development environment
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 
-2. **Clone Your Fork**
-   ```bash
-   # Clone your forked repository
-   git clone https://github.com/YOUR_USERNAME/mono-mcp.git
-   cd mono-mcp
-   ```
+# Create feature branch and start developing
+git checkout -b feature/your-feature-name
+```
 
-3. **Set Up Development Environment**
-   ```bash
-   # Create virtual environment
-   python3 -m venv .venv
-   source .venv/bin/activate
-
-   # Install dependencies
-   pip install -r requirements.txt
-
-   # Install development dependencies
-   pip install pytest coverage black ruff mypy
-
-   # Configure environment
-   cp .env.example .env
-   # Edit .env with your Mono API credentials
-   ```
-
-4. **Create a Feature Branch**
-   ```bash
-   # Create and switch to a new feature branch
-   git checkout -b feature/your-feature-name
-
-   # Examples:
-   git checkout -b feature/add-webhook-metrics
-   git checkout -b fix/payment-validation-bug
-   git checkout -b docs/improve-setup-guide
-   ```
-
-### 🔧 Development Workflow
-
-1. **Make Your Changes**
-   - Write clear, well-documented code
-   - Follow existing code style and patterns
-   - Add tests for new functionality
-
-2. **Test Your Changes**
-   ```bash
-   # Run all tests
-   pytest
-
-   # Run tests with coverage
-   coverage run -m pytest
-   coverage report
-
-   # Test specific functionality
-   pytest tests/test_your_feature.py -v
-   ```
-
-3. **Code Quality Checks**
-   ```bash
-   # Format code
-   black mono_banking_mcp/
-
-   # Lint code
-   ruff check mono_banking_mcp/
-
-   # Type checking
-   mypy mono_banking_mcp/
-   ```
-
-4. **Commit Your Changes**
-   ```bash
-   # Stage your changes
-   git add .
-
-   # Commit with descriptive message
-   git commit -m "feat: add webhook metrics collection
-
-   - Add metrics collection for webhook events
-   - Include response time and success rate tracking
-   - Add Prometheus-compatible endpoint
-   - Update documentation and tests
-
-   Fixes #123"
-   ```
-
-5. **Push and Create Pull Request**
-   ```bash
-   # Push your feature branch
-   git push origin feature/your-feature-name
-
-   # Go to GitHub and create a Pull Request
-   # https://github.com/sin4ch/mono-mcp/compare
-   ```
-
-### 📝 Contribution Guidelines
-
-- **Issues First**: For major changes, please open an issue first to discuss
-- **Clear Descriptions**: Write clear commit messages and PR descriptions
-- **Test Coverage**: Maintain or improve test coverage for all changes
-- **Documentation**: Update README and docstrings for new features
-- **Code Style**: Follow the existing code style and use provided tools
-
-### 🐛 Bug Reports
-
-When reporting bugs, please include:
-- Python version and OS
-- Steps to reproduce the issue
-- Expected vs actual behavior
-- Error messages or logs
-- Minimal code example (if applicable)
-
-### 💡 Feature Requests
-
-For feature requests, please provide:
-- Clear description of the proposed feature
-- Use case and benefits
-- Potential implementation approach
-- Any breaking changes considerations
-
-### Resources
-- **MCP protocol**: https://modelcontextprotocol.io/
-- **Mono API**: https://docs.mono.co/
+For questions or help getting started, please open an issue or check our [Contributing Guide](CONTRIBUTING.md).
