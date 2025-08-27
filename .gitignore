@@ -6,3 +6,4 @@ __pycache__/
 .venv/
 .vscode/settings.json
 /docs
+/mono_banking_mcp.egg-info

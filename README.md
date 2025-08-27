@@ -62,6 +62,24 @@ sequenceDiagram
 - **python-dotenv** - Environment variable management
 - **uv** - Fast Python package manager (recommended)
 
+## 🏗️ Project Structure
+
+```
+mono-banking-mcp/
+├── mono_banking_mcp/           # Main package
+│   ├── __init__.py            # Package initialization
+│   ├── server.py              # FastMCP server with tools
+│   └── mono_client.py         # Mono API client
+├── tests/                     # Test suite
+│   └── test_mono_banking.py   # Unit tests
+├── docs/                      # Documentation
+├── requirements.txt          # Dependencies
+├── claude_desktop_config.json # Claude Desktop integration
+├── .env.example              # Environment template
+├── .gitignore                # Git ignore rules
+└── README.md                 # This file
+```
+
 ## 📦 Installation and Setup
 
 ### Prerequisites
@@ -194,74 +212,6 @@ The server provides these comprehensive banking tools:
 #### Utility Functions
 - **`get_nigerian_banks`**: Returns complete list of supported banks with codes
 - **`initiate_account_linking`**: Starts the account linking process for new customers
-
-## 🔒 Security Best Practices
-
-### API Key Security
-- **Never expose secret keys** in client-side code or logs
-- **Store keys securely** in environment variables only
-- **Use HTTPS** for all API communications
-- **Rotate keys regularly** and monitor for unauthorized access
-
-### Payment Security
-- **Always verify account names** before initiating payments
-- **Validate payment amounts** and recipient details
-- **Use webhook verification** for real-time payment events
-- **Implement proper error handling** to prevent information leakage
-
-### Webhook Security
-- **Verify webhook signatures** using the `mono-webhook-secret` header
-- **Use HTTPS endpoints** for webhook URLs
-- **Implement replay attack protection** with timestamp validation
-- **Log webhook events** for audit trails (without sensitive data)
-
-### Environment Security
-- **Use sandbox environment** for testing (no real money moves)
-- **Separate production and development** credentials
-- **Follow PCI DSS guidelines** for payment data handling
-- **Monitor API usage** and set up alerts for unusual activity
-
-## 🎯 FastMCP Implementation
-
-This server uses **FastMCP** for a clean, decorator-based implementation:
-
-```python
-from mcp.server.fastmcp import FastMCP
-
-mcp = FastMCP("Mono Banking")
-
-@mcp.tool()
-async def get_account_balance(account_id: str) -> dict:
-    """Get current account balance for a linked account."""
-    # Implementation...
-    return result
-```
-
-### Benefits of FastMCP:
-- **Simple decorators** instead of verbose handler registration
-- **Automatic type inference** from function signatures
-- **Clean async/await** patterns
-- **Minimal boilerplate** code
-- **Built-in documentation** from function docstrings
-- **Type safety** with automatic validation
-
-## 🏗️ Project Structure
-
-```
-mono-banking-mcp/
-├── mono_banking_mcp/           # Main package
-│   ├── __init__.py            # Package initialization
-│   ├── server.py              # FastMCP server with tools
-│   └── mono_client.py         # Mono API client
-├── tests/                     # Test suite
-│   └── test_mono_banking.py   # Unit tests
-├── docs/                      # Documentation
-├── requirements.txt          # Dependencies
-├── claude_desktop_config.json # Claude Desktop integration
-├── .env.example              # Environment template
-├── .gitignore                # Git ignore rules
-└── README.md                 # This file
-```
 
 ## 🚀 Development
 
