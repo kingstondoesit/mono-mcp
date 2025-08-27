@@ -277,15 +277,7 @@ mypy mono_banking_mcp/
 
 ## 🤝 Contributing
 
-We welcome contributions to the Mono Banking MCP Server! Please see our [Contributing Guide](CONTRIBUTING.md) for detailed information on:
-
-- 🚀 Development setup and environment configuration
-- 🔧 Making changes and development workflow  
-- 🧪 Testing requirements and best practices
-- 📤 Submitting pull requests and code review process
-- 📝 Issue guidelines for bugs and feature requests
-
-Whether you're fixing bugs, adding features, or improving documentation, we appreciate your help in making this project better!
+We welcome contributions to the Mono Banking MCP Server! For questions or help getting started, please open an issue or check our [Contributing Guide](CONTRIBUTING.md).
 
 **Quick Start for Contributors:**
 ```bash
@@ -300,5 +292,3 @@ pip install -r requirements.txt
 # Create feature branch and start developing
 git checkout -b feature/your-feature-name
 ```
-
-For questions or help getting started, please open an issue or check our [Contributing Guide](CONTRIBUTING.md).
