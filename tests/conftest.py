@@ -80,6 +80,12 @@ def sample_banks_data():
     ]
 
 
+@pytest.fixture
+def mock_mono_client():
+    """Create a mocked MonoClient for testing."""
+    return AsyncMock(spec=MonoClient)
+
+
 @pytest.fixture(autouse=True)
 def setup_test_environment():
     """Set up test environment variables."""

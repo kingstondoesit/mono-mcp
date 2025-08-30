@@ -8,3 +8,5 @@ __pycache__/
 .vscode/settings.json
 /docs
 /mono_banking_mcp.egg-info
+*.db
+mono_banking.db
