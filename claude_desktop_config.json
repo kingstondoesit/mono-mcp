@@ -1,9 +1,10 @@
 {
   "mcpServers": {
     "mono-banking": {
-      "command": "python",
-      "args": ["-m", "mono_banking_mcp.server"],
-      "cwd": "/location/in/localhost"
+      "command": "uv",
+      "args": ["run", "mono-banking-mcp"],
+      "cwd": "/path/to/mcp/server"
     }
   }
 }
+

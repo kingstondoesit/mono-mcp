@@ -1,28 +1,9 @@
 {
-  "version": "1.0",
   "mcpServers": {
     "mono-banking": {
       "command": "uv",
       "args": ["run", "mono-banking-mcp"],
-      "env": {
-        "MONO_SECRET_KEY": "your_actual_mono_secret_key_here",
-        "MONO_BASE_URL": "https://api.withmono.com",
-        "MONO_ENVIRONMENT": "sandbox"
-      },
-      "cwd": "/home/osinachi/projects/sqrt",
-      "description": "Nigerian banking operations via Mono Open Banking API",
-      "capabilities": {
-        "tools": true,
-        "resources": false,
-        "prompts": false
-      },
-      "timeout": 30000,
-      "restartOnFailure": true
+      "cwd": "/path/to/mcp/server"
     }
-  },
-  "globalSettings": {
-    "logLevel": "info",
-    "maxConcurrentConnections": 5,
-    "connectionTimeout": 10000
   }
 }

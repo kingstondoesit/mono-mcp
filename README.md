@@ -55,36 +55,22 @@ sequenceDiagram
 ```
 mono-mcp/
 ├── 📦 mono_banking_mcp/           # Main package
-│   ├── __init__.py               # Package initialization
 │   ├── server.py                 # FastMCP server with 11 banking tools
 │   ├── mono_client.py            # Mono API client with async httpx
 │   ├── webhook_server.py         # FastAPI webhook server for real-time events
 │   └── database.py               # SQLite database for webhook events storage
 ├── 🧪 tests/                     # Comprehensive test suite
-│   ├── conftest.py               # Test configuration and fixtures
-│   └── test_mono_banking.py      # Unit tests for all MCP tools (19 tests)
-│   ├── python-mcp-sdk.md         # MCP SDK documentation
-│   └── *.md                      # Additional guides and tutorials
 ├── 🔧 .vscode/                   # VS Code configuration
-│   ├── settings.json             # Editor settings for development
 │   └── mcp-config.json           # MCP integration configuration
-├── ⚙️ Configuration Files
-│   ├── pyproject.toml            # Modern Python project configuration (uv-based)
-│   ├── uv.lock                   # Dependency lock file (225 packages locked)
-│   ├── pytest.ini               # Test configuration and markers
-│   ├── Makefile                  # Development workflow automation
-│   ├── claude_desktop_config.json # Claude Desktop MCP integration
-│   └── .env.example              # Environment variables template
-├── 📄 Project Files
-│   ├── README.md                 # This comprehensive documentation
-│   ├── CONTRIBUTING.md           # Contribution guidelines
-│   └── .gitignore                # Git ignore rules (includes *.db, requirements.txt)
-└── 🏗️ Build Artifacts (gitignored)
-    ├── mono_banking_mcp.egg-info/ # Package metadata
-    ├── __pycache__/              # Python bytecode cache
-    ├── .pytest_cache/            # Test cache
-    ├── *.db                      # Runtime database files
-    └── .venv/                    # Virtual environment
+├── pyproject.toml            # Modern Python project configuration (uv-based)
+├── uv.lock                   # Dependency lock file (225 packages locked)
+├── pytest.ini               # Test configuration and markers
+├── Makefile                  # Development workflow automation
+├── claude_desktop_config.json # Claude Desktop MCP integration
+├── .env.example              # Environment variables template
+├── README.md                 # This comprehensive documentation
+├── CONTRIBUTING.md           # Contribution guidelines
+└── .gitignore                # Git ignore rules
 ```
 
 ## 📦 Installation and Setup
@@ -229,27 +215,6 @@ The server provides these comprehensive banking tools (11 total):
 | `lookup_bvn` | Perform BVN identity verification | `bvn`, `scope` |
 | `initiate_account_linking` | Start account linking process for new customers | `customer_name`, `customer_email` |
 
-### Tool Categories
-
-#### 🏦 Account Management (4 tools)
-- **`list_linked_accounts`**: Returns all bank accounts linked to your Mono business
-- **`get_account_balance`**: Retrieves real-time balance in Nigerian Naira (₦) for a specific account
-- **`get_account_info`**: Gets basic account details including bank information and account type
-- **`get_account_details`**: Comprehensive account information including BVN if available
-
-#### 📊 Transaction Operations (1 tool)
-- **`get_transaction_history`**: Fetches paginated transaction records with date, amount, and narration
-
-#### 💸 Payment Operations (3 tools)
-- **`verify_account_name`**: Verifies recipient account name before payments (recommended for security)
-- **`initiate_payment`**: Starts a DirectPay payment flow (returns authorization URL for completion)
-- **`verify_payment`**: Checks the real-time status of a payment using its reference number
-
-#### 🔍 Utility & Verification (3 tools)
-- **`get_nigerian_banks`**: Returns complete directory of supported banks with names, codes, and slugs
-- **`lookup_bvn`**: Bank Verification Number (BVN) identity verification and validation
-- **`initiate_account_linking`**: Starts the Mono Connect flow for new customer onboarding
-
 ## 🚀 Development
 
 ### Quick Start
@@ -300,26 +265,6 @@ make server-debug   # Run with debug logging
 make tools          # List all available MCP tools
 ```
 
-### Testing Configuration (pytest.ini)
-
-The project uses **pytest.ini** for consistent test behavior across environments:
-
-```ini
-[pytest]
-# Async support for banking operations
-asyncio_mode = auto
-
-# Test discovery and organization  
-testpaths = tests
-markers =
-    integration: requires MONO_SECRET_KEY environment variable
-    performance: benchmarks and load tests
-    unit: fast isolated tests
-
-# Clean output
-filterwarnings = ignore::DeprecationWarning
-```
-
 **Test Categories:**
 ```bash
 # Fast development tests (default)
@@ -364,7 +309,7 @@ mypy mono_banking_mcp/ --ignore-missing-imports
 
 ## 🤝 Contributing
 
-We welcome contributions to the Mono Banking MCP Server! For questions or help getting started, please open an issue or check our [Contributing Guide](CONTRIBUTING.md).
+Contributions to the Mono Banking MCP Server are welcome! For questions or help getting started, please open an issue.
 
 **Quick Start for Contributors:**
 ```bash
