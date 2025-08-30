@@ -278,6 +278,8 @@ uv run pytest -m "performance"         # Only performance tests
 ```
 
 # Test MCP server initialization
+
+```python
 python -c "
 import asyncio
 from mono_banking_mcp.server import mcp
