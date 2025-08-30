@@ -39,23 +39,6 @@ sequenceDiagram
     Client-->>MCP: Account balance data
     MCP-->>AI: {"success": true, "balance": "₦500.00"}
     AI-->>User: "Your account balance is ₦500.00"
-
-    Note over User,API: Payment Flow
-    User->>AI: "Send ₦1000 to 0123456789 at GTBank"
-    AI->>MCP: verify_account_name("0123456789", "058")
-    MCP->>Client: resolve_account_name()
-    Client->>API: POST /misc/banks/resolve
-    API-->>Client: {"account_name": "JOHN DOE"}
-    Client-->>MCP: Account verification
-    MCP-->>AI: {"verified": true, "account_name": "JOHN DOE"}
-
-    AI->>MCP: initiate_payment(amount, recipient, customer)
-    MCP->>Client: initiate_payment()
-    Client->>API: POST /payments/initiate
-    API-->>Client: {"mono_url": "https://connect.mono.co/..."}
-    Client-->>MCP: Payment authorization URL
-    MCP-->>AI: {"success": true, "mono_url": "..."}
-    AI-->>User: "Payment initiated. Complete at: [URL]"
 ```
 
 ## 🛠️ Technologies Used
@@ -114,13 +97,13 @@ mono-banking-mcp/
    cd mono-banking-mcp
    ```
 
-2. **Install dependencies:**
+2. **Install dependencies and the package:**
    ```bash
-   # Using pip (recommended)
-   pip install -r requirements.txt
-
-   # Or using uv (faster)
-   uv pip install -r requirements.txt
+   # Using uv (recommended for all environments)
+   uv sync
+   
+   # Install the package in development mode
+   uv pip install -e .
    ```
 
 3. **Configure environment variables:**
@@ -145,9 +128,12 @@ MONO_ENVIRONMENT=sandbox  # or 'production'
 
 ### Standalone Server
 
-Run the MCP server directly:
+Run the MCP server directly (ensure the package is installed first):
 
 ```bash
+# Install the package if not already done
+uv pip install -e .
+
 # Run the server
 python -m mono_banking_mcp.server
 
@@ -163,8 +149,8 @@ Add to your Claude Desktop configuration (`~/.config/claude-desktop/config.json`
 {
   "mcpServers": {
     "mono-banking": {
-      "command": "python",
-      "args": ["-m", "mono_banking_mcp.server"],
+      "command": "uv",
+      "args": ["run", "python", "-m", "mono_banking_mcp.server"],
       "cwd": "/path/to/mono-banking-mcp",
       "env": {
         "MONO_SECRET_KEY": "your_actual_mono_secret_key_here",
@@ -181,46 +167,68 @@ The project includes VS Code configuration files in `.vscode/` for seamless inte
 
 ### Usage Examples
 
-Once connected to an AI assistant, you can use natural language commands:
+Once connected to an AI assistant (Claude, Gemini, etc.), you can use natural language commands:
 
+#### Account Management
 - *"List all my linked bank accounts"*
-- *"Check the balance for account ID abc123"*
-- *"Initiate a payment of ₦5000 to account 1234567890 at Access Bank"*
-- *"Show me all Nigerian banks and their codes"*
-- *"Verify account name for account 0123456789 at GTBank"*
+- *"Show me the balance for account abc123"*
+- *"Get detailed information for my GTBank account"*
+- *"Show me the last 20 transactions for account xyz789"*
+
+#### Payment Operations
+- *"Verify the account name for 0123456789 at GTBank (code 058)"*
+- *"Initiate a payment of ₦5000 to account 1234567890 at Access Bank for John Doe"*
+- *"Check the status of payment reference PAY_ABC123"*
+
+#### Banking Information
+- *"Show me all supported Nigerian banks and their codes"*
+- *"Look up BVN 12345678901 for identity verification"*
+- *"Help a new customer link their bank account"*
+
+#### Complete Workflow Example
+1. *"Show me all Nigerian banks"* - Get bank codes
+2. *"Verify account 1234567890 at Access Bank"* - Confirm recipient
+3. *"Initiate payment of ₦10000 to verified account for rent payment"* - Start payment
+4. *"Check payment status for the reference you just gave me"* - Verify completion
 
 ## 🛠️ Available Banking Tools
 
-The server provides these comprehensive banking tools:
+The server provides these comprehensive banking tools (11 total):
 
 | Tool | Description | Parameters |
 |------|-------------|------------|
 | `list_linked_accounts` | List all linked bank accounts | None |
 | `get_account_balance` | Get current account balance | `account_id` |
-| `get_account_info` | Get detailed account information | `account_id` |
-| `get_transaction_history` | Retrieve transaction records | `account_id`, `limit`, `page` |
-| `verify_account_name` | Verify recipient account details | `account_number`, `bank_code` |
-| `initiate_payment` | Start a payment via DirectPay | `amount`, recipient details, customer info |
-| `verify_payment` | Check payment status | `reference` |
-| `get_nigerian_banks` | List supported Nigerian banks | None |
-| `initiate_account_linking` | Start account linking process | customer details |
+| `get_account_info` | Get basic account information | `account_id` |
+| `get_account_details` | Get comprehensive account details including BVN | `account_id` |
+| `get_transaction_history` | Retrieve transaction records with pagination | `account_id`, `limit`, `page` |
+| `verify_account_name` | Verify recipient account details before payments | `account_number`, `bank_code` |
+| `initiate_payment` | Start a payment via Mono DirectPay | `amount`, `recipient_account_number`, `recipient_bank_code`, customer info |
+| `verify_payment` | Check payment status using reference | `reference` |
+| `get_nigerian_banks` | List all supported Nigerian banks with codes | None |
+| `lookup_bvn` | Perform BVN identity verification | `bvn`, `scope` |
+| `initiate_account_linking` | Start account linking process for new customers | `customer_name`, `customer_email` |
 
-### Tool Details
+### Tool Categories
 
-#### Account Management
-- **`list_linked_accounts`**: Returns all bank accounts linked to your business
-- **`get_account_balance`**: Retrieves real-time balance for a specific account
-- **`get_account_info`**: Gets comprehensive account details including bank information
-- **`get_transaction_history`**: Fetches transaction records with pagination support
+#### 🏦 Account Management (4 tools)
+- **`list_linked_accounts`**: Returns all bank accounts linked to your Mono business
+- **`get_account_balance`**: Retrieves real-time balance in Nigerian Naira (₦) for a specific account
+- **`get_account_info`**: Gets basic account details including bank information and account type
+- **`get_account_details`**: Comprehensive account information including BVN if available
 
-#### Payment Operations
-- **`verify_account_name`**: Verifies recipient account name before payments (recommended)
-- **`initiate_payment`**: Starts a DirectPay payment flow (returns authorization URL)
-- **`verify_payment`**: Checks the status of a payment using its reference
+#### 📊 Transaction Operations (1 tool)
+- **`get_transaction_history`**: Fetches paginated transaction records with date, amount, and narration
 
-#### Utility Functions
-- **`get_nigerian_banks`**: Returns complete list of supported banks with codes
-- **`initiate_account_linking`**: Starts the account linking process for new customers
+#### 💸 Payment Operations (3 tools)
+- **`verify_account_name`**: Verifies recipient account name before payments (recommended for security)
+- **`initiate_payment`**: Starts a DirectPay payment flow (returns authorization URL for completion)
+- **`verify_payment`**: Checks the real-time status of a payment using its reference number
+
+#### 🔍 Utility & Verification (3 tools)
+- **`get_nigerian_banks`**: Returns complete directory of supported banks with names, codes, and slugs
+- **`lookup_bvn`**: Bank Verification Number (BVN) identity verification and validation
+- **`initiate_account_linking`**: Starts the Mono Connect flow for new customer onboarding
 
 ## 🚀 Development
 
@@ -230,40 +238,53 @@ The server provides these comprehensive banking tools:
 git clone <your-repo-url>
 cd mono-banking-mcp
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies and package in development mode
+uv sync
+uv pip install -e .
 
 # Configure environment
 cp .env.example .env
 # Edit .env with your Mono API key
 
-# Run server
+# Run server to test
 python -m mono_banking_mcp.server
 ```
 
 ### Testing
 ```bash
-# Run tests
-pytest
+# Run tests (dev dependencies included with uv sync)
+pytest tests/ -v
 
-# Run with coverage (install coverage first: pip install coverage)
-coverage run -m pytest
-coverage report
+# Run with coverage
+pytest tests/ --cov=mono_banking_mcp --cov-report=html
 
-# Test specific functionality
-python -c "from mono_banking_mcp.server import mcp; print('Server works!')"
+# Test MCP server initialization
+python -c "
+import asyncio
+from mono_banking_mcp.server import mcp
+
+async def test_tools():
+    tools = await mcp.list_tools()
+    print(f'✅ Successfully loaded {len(tools)} MCP tools')
+    for tool in tools:
+        print(f'  - {tool.name}')
+
+asyncio.run(test_tools())
+"
 ```
 
 ### Code Quality
 ```bash
+# All dev tools available after uv sync
+
 # Format code
-black mono_banking_mcp/
+black mono_banking_mcp/ tests/
 
 # Lint code
-ruff check mono_banking_mcp/
+ruff check mono_banking_mcp/ tests/
 
 # Type checking
-mypy mono_banking_mcp/
+mypy mono_banking_mcp/ --ignore-missing-imports
 ```
 
 ## 🤝 Contributing
@@ -277,9 +298,15 @@ git clone https://github.com/YOUR_USERNAME/mono-mcp.git
 cd mono-mcp
 
 # Set up development environment
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
+uv pip install -e .
+
+# Verify installation
+python -c "from mono_banking_mcp.server import mcp; print('✅ Package installed successfully')"
 
 # Create feature branch and start developing
 git checkout -b feature/your-feature-name
+
+# Run tests before making changes
+pytest tests/ -v
 ```

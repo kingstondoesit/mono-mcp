@@ -121,22 +121,70 @@ python -m pytest tests/test_mono_banking.py -v
 ### Test Requirements
 
 - **All new features** must include tests
-- **Bug fixes** should include regression tests
+- **Bug fixes** should include regression tests  
 - **Maintain test coverage** above 80%
 - **Test both success and error scenarios**
 
-### Test Structure
+### Test Categories
+
+1. **Unit Tests**: Test individual functions and classes in isolation
+2. **Integration Tests**: Test API interactions (marked with `@pytest.mark.integration`)
+3. **Performance Tests**: Test concurrent operations and large datasets
+4. **Error Handling**: Test all error scenarios and edge cases
+
+### Using Make Commands
+
+```bash
+# Quick unit tests only
+make test
+
+# All tests with coverage report
+make test-all
+
+# Integration tests (requires API key)
+make test-integration
+
+# Performance benchmarks
+make test-performance
+
+# Full CI pipeline locally
+make ci
+```
+
+### Test Structure Guidelines
 
 ```python
+"""Test module docstring explaining what is being tested."""
+
 import pytest
 from unittest.mock import AsyncMock, patch
-from mcp.server.stdio import stdio_server
-from mono_banking_mcp.server import app
+from mono_banking_mcp.server import your_tool
 
-@pytest.mark.asyncio
-async def test_your_feature():
-    # Test implementation
-    pass
+class TestYourFeature:
+    """Test class for specific feature or tool."""
+
+    @pytest.fixture
+    def mock_client(self):
+        """Mock MonoClient for testing."""
+        return AsyncMock()
+
+    @pytest.mark.asyncio
+    async def test_successful_operation(self, mock_client):
+        """Test successful operation with proper response."""
+        mock_client.method.return_value = {"status": True, "data": {}}
+        
+        with patch('mono_banking_mcp.server.mono_client', mock_client):
+            result = await your_tool("param")
+            
+        assert result["success"] is True
+
+    @pytest.mark.asyncio  
+    async def test_error_handling(self, mock_client):
+        """Test proper error handling."""
+        mock_client.method.side_effect = Exception("API Error")
+        
+        result = await your_tool("param")
+        assert result["success"] is False
 ```
 
 ## 🎨 Code Style
