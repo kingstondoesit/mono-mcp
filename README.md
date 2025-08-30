@@ -53,23 +53,38 @@ sequenceDiagram
 ## 📁 Project Structure
 
 ```
-mono-banking-mcp/
-├── mono_banking_mcp/           # Main package
-│   ├── __init__.py            # Package initialization
-│   ├── server.py              # FastMCP server with comprehensive banking tools
-│   ├── mono_client.py         # Mono API client with httpx
-│   ├── webhook_server.py      # FastAPI webhook server for real-time events
-│   └── database.py            # SQLite database for webhook events storage
-├── tests/                     # Test suite
-│   └── test_mono_banking.py   # Unit tests for MCP tools
-├── .vscode/                   # VS Code configuration
-│   └── settings.json          # Editor settings for development
-├── requirements.txt           # Python dependencies
-├── pyproject.toml            # Modern Python project configuration
-├── claude_desktop_config.json # Claude Desktop MCP integration
-├── .env.example              # Environment variables template
-├── .gitignore                # Git ignore rules and build artifacts
-└── README.md                 # This comprehensive documentation
+mono-mcp/
+├── 📦 mono_banking_mcp/           # Main package
+│   ├── __init__.py               # Package initialization
+│   ├── server.py                 # FastMCP server with 11 banking tools
+│   ├── mono_client.py            # Mono API client with async httpx
+│   ├── webhook_server.py         # FastAPI webhook server for real-time events
+│   └── database.py               # SQLite database for webhook events storage
+├── 🧪 tests/                     # Comprehensive test suite
+│   ├── conftest.py               # Test configuration and fixtures
+│   └── test_mono_banking.py      # Unit tests for all MCP tools (19 tests)
+│   ├── python-mcp-sdk.md         # MCP SDK documentation
+│   └── *.md                      # Additional guides and tutorials
+├── 🔧 .vscode/                   # VS Code configuration
+│   ├── settings.json             # Editor settings for development
+│   └── mcp-config.json           # MCP integration configuration
+├── ⚙️ Configuration Files
+│   ├── pyproject.toml            # Modern Python project configuration (uv-based)
+│   ├── uv.lock                   # Dependency lock file (225 packages locked)
+│   ├── pytest.ini               # Test configuration and markers
+│   ├── Makefile                  # Development workflow automation
+│   ├── claude_desktop_config.json # Claude Desktop MCP integration
+│   └── .env.example              # Environment variables template
+├── 📄 Project Files
+│   ├── README.md                 # This comprehensive documentation
+│   ├── CONTRIBUTING.md           # Contribution guidelines
+│   └── .gitignore                # Git ignore rules (includes *.db, requirements.txt)
+└── 🏗️ Build Artifacts (gitignored)
+    ├── mono_banking_mcp.egg-info/ # Package metadata
+    ├── __pycache__/              # Python bytecode cache
+    ├── .pytest_cache/            # Test cache
+    ├── *.db                      # Runtime database files
+    └── .venv/                    # Virtual environment
 ```
 
 ## 📦 Installation and Setup
@@ -77,7 +92,7 @@ mono-banking-mcp/
 ### Prerequisites
 
 - **Python 3.12+** - Modern Python with async/await support
-- **pip** or **[uv](https://docs.astral.sh/uv/)** - Python package manager
+- **[uv](https://docs.astral.sh/uv/)** - Fast Python package manager (recommended)
 - **Mono API credentials** - Get them at [mono.co](https://mono.co)
 
 ### Step 1: Get Mono API Credentials
@@ -94,16 +109,21 @@ mono-banking-mcp/
 1. **Clone and setup the project:**
    ```bash
    git clone <your-repo-url>
-   cd mono-banking-mcp
+   cd mono-mcp
    ```
 
-2. **Install dependencies and the package:**
+2. **Install dependencies using uv (recommended):**
    ```bash
-   # Using uv (recommended for all environments)
+   # Install all dependencies (runtime + development)
    uv sync
    
-   # Install the package in development mode
-   uv pip install -e .
+   # Alternative: Install the package directly
+   uv pip install -e ".[dev]"
+   ```
+
+   **Or using pip (if uv is not available):**
+   ```bash
+   pip install -e ".[dev]"
    ```
 
 3. **Configure environment variables:**
@@ -236,27 +256,82 @@ The server provides these comprehensive banking tools (11 total):
 ```bash
 # Clone and setup
 git clone <your-repo-url>
-cd mono-banking-mcp
+cd mono-mcp
 
 # Install dependencies and package in development mode
 uv sync
-uv pip install -e .
 
 # Configure environment
 cp .env.example .env
 # Edit .env with your Mono API key
 
 # Run server to test
-python -m mono_banking_mcp.server
+uv run python -m mono_banking_mcp.server
 ```
 
-### Testing
+### Development Workflow (Makefile Commands)
 ```bash
-# Run tests (dev dependencies included with uv sync)
-pytest tests/ -v
+# Run the complete developer workflow:
+make help           # Show all available commands
 
-# Run with coverage
-pytest tests/ --cov=mono_banking_mcp --cov-report=html
+# Testing
+make test           # Run unit tests with coverage
+make test-unit      # Run only unit tests  
+make test-integration  # Run integration tests (requires MONO_SECRET_KEY)
+make test-performance  # Run performance tests
+make test-all       # Run all tests including integration
+
+# Code Quality
+make lint           # Run ruff linting
+make format         # Format code with black
+make format-check   # Check code formatting
+make type-check     # Run mypy type checking
+
+# Full CI Pipeline
+make ci             # Run complete CI pipeline locally
+
+# Development
+make install        # Install dependencies
+make clean          # Clean build artifacts
+
+# MCP Server Operations
+make server         # Run MCP server for testing
+make server-debug   # Run with debug logging
+make tools          # List all available MCP tools
+```
+
+### Testing Configuration (pytest.ini)
+
+The project uses **pytest.ini** for consistent test behavior across environments:
+
+```ini
+[pytest]
+# Async support for banking operations
+asyncio_mode = auto
+
+# Test discovery and organization  
+testpaths = tests
+markers =
+    integration: requires MONO_SECRET_KEY environment variable
+    performance: benchmarks and load tests
+    unit: fast isolated tests
+
+# Clean output
+filterwarnings = ignore::DeprecationWarning
+```
+
+**Test Categories:**
+```bash
+# Fast development tests (default)
+make test              # Only unit tests
+
+# Full test suite
+make test-all         # All tests including integration
+
+# Selective testing  
+uv run pytest -m "not integration"     # Skip tests requiring API keys
+uv run pytest -m "performance"         # Only performance tests
+```
 
 # Test MCP server initialization
 python -c "
