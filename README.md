@@ -69,7 +69,6 @@ mono-mcp/
 ├── claude_desktop_config.json # Claude Desktop MCP integration
 ├── .env.example              # Environment variables template
 ├── README.md                 # This comprehensive documentation
-├── CONTRIBUTING.md           # Contribution guidelines
 └── .gitignore                # Git ignore rules
 ```
 
