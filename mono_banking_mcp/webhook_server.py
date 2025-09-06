@@ -124,7 +124,7 @@ async def handle_account_updated(data: Dict[str, Any]):
         existing_account.update({
             "status": data_status,
             "bank_name": account_info.get("institution", {}).get("name"),
-            "bank_code": account_info.get("institution", {}).get("bankCode"),
+            "bank_code": account_info.get("institution", {}).get("bankCode")
         })
         db.store_account(existing_account)
 
