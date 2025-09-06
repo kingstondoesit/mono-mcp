@@ -127,6 +127,7 @@ MONO_PUBLIC_KEY=your_mono_public_key_here
 MONO_WEBHOOK_SECRET=your_webhook_secret_here
 MONO_BASE_URL=https://api.withmono.com
 MONO_ENVIRONMENT=sandbox  # or 'production'
+DATABASE_URL=postgres or mysql or just leave it out to use sqlite as default
 ```
 
 ## 🚀 Usage
