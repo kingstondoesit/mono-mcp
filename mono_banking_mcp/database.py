@@ -70,7 +70,7 @@ class MonoBankingDB:
                 f"Failed to create database engine for URL '{db_url}'"
             ) from e
         self.db_engine = db_engine
-        self.Session = sessionmaker(bind=self.db_engine)
+        self.database = sessionmaker(bind=self.db_engine)
         inspector = inspect(self.db_engine)
         existing_tables = inspector.get_table_names()
 
@@ -84,7 +84,7 @@ class MonoBankingDB:
     def store_account(self, account_data: Dict[str, Any]) -> bool:
         """store or update account information"""
         try:
-            with self.Session() as db:
+            with self.database() as db:
                 account = db.get(Account, account_data.get("id"))
                 if not account:
                     account = Account(**account_data)
@@ -102,7 +102,7 @@ class MonoBankingDB:
     def get_account(self, account_id: str) -> Optional[Dict[str, Any]]:
         """retrieve account by id"""
         try:
-            with self.Session() as db:
+            with self.database() as db:
                 account = db.get(Account, account_id)
                 if account:
                     return {
@@ -129,7 +129,7 @@ class MonoBankingDB:
     ) -> bool:
         """store webhook event for processing"""
         try:
-            with self.Session() as db:
+            with self.database() as db:
                 webhook_event = WebhookEvent(
                     event_type=event_type, account_id=account_id, data=json.dumps(data)
                 )
@@ -145,7 +145,7 @@ class MonoBankingDB:
     ) -> bool:
         """store transaction history"""
         try:
-            with self.Session() as db:
+            with self.database() as db:
                 for txn in transactions:
                     existing_txn = db.get(Transaction, txn.get("_id"))
                     if existing_txn:
@@ -181,7 +181,7 @@ class MonoBankingDB:
     ) -> List[Dict[str, Any]]:
         """get recent transactions from database"""
         try:
-            with self.Session() as db:
+            with self.database() as db:
                 transactions = (
                     db.query(Transaction)
                     .filter(Transaction.account_id == account_id)
@@ -212,7 +212,7 @@ class MonoBankingDB:
     def remove_account(self, account_id: str) -> bool:
         """remove account and related data"""
         try:
-            with self.Session() as db:
+            with self.database() as db:
                 account = db.get(Account, account_id)
                 if account:
                     db.delete(account)
