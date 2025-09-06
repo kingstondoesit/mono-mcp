@@ -196,7 +196,7 @@ Once connected to an AI assistant (Claude, Gemini, etc.), you can use natural la
 3. *"Initiate payment of ₦10000 to verified account for rent payment"* - Start payment
 4. *"Check payment status for the reference you just gave me"* - Verify completion
 
-## 🛠️ Available Banking Tools
+## Available Banking Tools
 
 The server provides these comprehensive banking tools (11 total):
 
