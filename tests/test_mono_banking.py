@@ -287,7 +287,7 @@ class TestDatabaseIntegration:
         """Test database connection and basic operations."""
         from mono_banking_mcp.database import MonoBankingDB
         
-        db = MonoBankingDB(":memory:")  # Use in-memory database for testing
+        db = MonoBankingDB("sqlite:///:memory:")  # Use in-memory database for testing
         
         # Test storing a webhook event
         event_data = {
