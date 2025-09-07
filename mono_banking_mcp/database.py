@@ -96,7 +96,6 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error storing account: {e}")
             return False
-
           
     def get_account(self, account_id: str) -> Optional[Dict[str, Any]]:
         """retrieve account by id"""
@@ -122,7 +121,6 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error getting account: {e}")
             return None
-
           
     def store_webhook_event(
         self, event_type: str, account_id: str, data: Dict[str, Any]
@@ -140,7 +138,6 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error storing webhook event: {e}")
             return False
-
           
     def store_transactions(
         self, account_id: str, transactions: List[Dict[str, Any]]
@@ -177,7 +174,6 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error storing transactions: {e}")
             return False
-
           
     def get_recent_transactions(
         self, account_id: str, limit: int = 10
@@ -212,7 +208,6 @@ class MonoBankingDB:
             print(f"error getting transactions: {e}")
             return []
 
-          
     def remove_account(self, account_id: str) -> bool:
         """remove account and related data"""
         try:
