@@ -28,7 +28,7 @@ WEBHOOK_SECRET = os.getenv("MONO_WEBHOOK_SECRET")
 def verify_webhook_signature(payload: bytes, signature: str) -> bool:
     """verify webhook signature using HMAC-SHA256"""
     if not WEBHOOK_SECRET:
-        raise ValueError("WEBHOOK_SECRET is not set")
+        return False
 
     if not signature:
         return False
