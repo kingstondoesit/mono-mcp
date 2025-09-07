@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
-from sqlalchemy import create_engine, func, inspect
+from sqlalchemy import create_engine, inspect
 
 
 class Base(DeclarativeBase):
