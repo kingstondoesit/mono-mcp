@@ -3,6 +3,7 @@ Mono Banking Webhook Server for handling real-time events.
 """
 
 import os
+
 import hmac
 import hashlib
 import json
@@ -12,11 +13,13 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from dotenv import load_dotenv
 from .database import MonoBankingDB
+from decouple import config as decouple_config
 
 load_dotenv()
 
 app = FastAPI(title="Mono Banking Webhooks", version="1.0.0")
-db = MonoBankingDB()
+db_url = decouple_config("DATABASE_URL", default="sqlite:///./mono_banking.db")
+db = MonoBankingDB(db_url=db_url)
 
 # get webhook secret from environment
 WEBHOOK_SECRET = os.getenv("MONO_WEBHOOK_SECRET")
