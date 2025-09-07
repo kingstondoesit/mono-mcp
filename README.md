@@ -2,7 +2,7 @@
 
 A comprehensive **Model Context Protocol (MCP)** server for Nigerian banking operations using the [Mono Open Banking API](https://mono.co).
 
-## � Table of Contents
+## Table of Contents
 
 - [Key Features](#-key-features)
 - [Architecture](#-architecture)
@@ -14,19 +14,19 @@ A comprehensive **Model Context Protocol (MCP)** server for Nigerian banking ope
 - [Development](#-development)
 - [Contributing](#-contributing)
 
-## �🚀 Key Features
+## Key Features
 
 Complete Nigerian banking operations through AI assistants with account management, real-time payments, BVN verification, and secure webhook integration via the Model Context Protocol (MCP).
 
-## 📊 Architecture
+## Architecture
 
 ```mermaid
 sequenceDiagram
-    participant User as 👤 User
-    participant AI as 🤖 AI Assistant<br/>(Claude/Gemini)
-    participant MCP as 🔌 MCP Server<br/>(FastMCP)
-    participant Client as 📡 Mono Client<br/>(httpx)
-    participant API as 🏦 Mono API<br/>(Nigerian Banks)
+    participant User as - User
+    participant AI as - AI Assistant<br/>(Claude/Gemini)
+    participant MCP as - MCP Server<br/>(FastMCP)
+    participant Client as - Mono Client<br/>(httpx)
+    participant API as - Mono API<br/>(Nigerian Banks)
 
     User->>AI: "Check my account balance"
     AI->>MCP: list_tools()
@@ -41,7 +41,7 @@ sequenceDiagram
     AI-->>User: "Your account balance is ₦500.00"
 ```
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Python 3.12+** - Modern Python with async/await support
 - **FastMCP** - Simplified MCP server implementation with decorators
@@ -50,17 +50,17 @@ sequenceDiagram
 - **python-dotenv** - Environment variable management
 - **uv** - Fast Python package manager (recommended)
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 mono-mcp/
-├── 📦 mono_banking_mcp/           # Main package
+├── mono_banking_mcp/           # Main package
 │   ├── server.py                 # FastMCP server with 11 banking tools
 │   ├── mono_client.py            # Mono API client with async httpx
 │   ├── webhook_server.py         # FastAPI webhook server for real-time events
 │   └── database.py               # SQLite database for webhook events storage
-├── 🧪 tests/                     # Comprehensive test suite
-├── 🔧 .vscode/                   # VS Code configuration
+├── tests/                     # Comprehensive test suite
+├── .vscode/                   # VS Code configuration
 │   └── mcp-config.json           # MCP integration configuration
 ├── pyproject.toml            # Modern Python project configuration (uv-based)
 ├── uv.lock                   # Dependency lock file (225 packages locked)
@@ -72,7 +72,7 @@ mono-mcp/
 └── .gitignore                # Git ignore rules
 ```
 
-## 📦 Installation and Setup
+## Installation and Setup
 
 ### Prerequisites
 
@@ -130,7 +130,7 @@ MONO_ENVIRONMENT=sandbox  # or 'production'
 DATABASE_URL=postgres or mysql or just leave it out to use sqlite as default
 ```
 
-## 🚀 Usage
+## Usage
 
 ### Standalone Server
 
@@ -197,7 +197,7 @@ Once connected to an AI assistant (Claude, Gemini, etc.), you can use natural la
 3. *"Initiate payment of ₦10000 to verified account for rent payment"* - Start payment
 4. *"Check payment status for the reference you just gave me"* - Verify completion
 
-## 🛠️ Available Banking Tools
+## Available Banking Tools
 
 The server provides these comprehensive banking tools (11 total):
 
@@ -215,7 +215,7 @@ The server provides these comprehensive banking tools (11 total):
 | `lookup_bvn` | Perform BVN identity verification | `bvn`, `scope` |
 | `initiate_account_linking` | Start account linking process for new customers | `customer_name`, `customer_email` |
 
-## 🚀 Development
+## Development
 
 ### Quick Start
 ```bash
@@ -287,7 +287,7 @@ from mono_banking_mcp.server import mcp
 
 async def test_tools():
     tools = await mcp.list_tools()
-    print(f'✅ Successfully loaded {len(tools)} MCP tools')
+    print(f' Successfully loaded {len(tools)} MCP tools')
     for tool in tools:
         print(f'  - {tool.name}')
 
@@ -309,7 +309,7 @@ ruff check mono_banking_mcp/ tests/
 mypy mono_banking_mcp/ --ignore-missing-imports
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions to the Mono Banking MCP Server are welcome! For questions or help getting started, please open an issue.
 
@@ -324,7 +324,7 @@ uv sync
 uv pip install -e .
 
 # Verify installation
-python -c "from mono_banking_mcp.server import mcp; print('✅ Package installed successfully')"
+python -c "from mono_banking_mcp.server import mcp; print('Package installed successfully')"
 
 # Create feature branch and start developing
 git checkout -b feature/your-feature-name

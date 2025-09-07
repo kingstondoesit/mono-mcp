@@ -63,7 +63,6 @@ class MonoBankingDB:
 
     def __init__(self, db_url: str, **kwargs: Any):
         try:
-
             db_engine = create_engine(db_url, **kwargs)
         except Exception as e:
             raise ValueError(
@@ -80,6 +79,7 @@ class MonoBankingDB:
             Base.metadata.create_all(self.db_engine)
         if "transactions" not in existing_tables:
             Base.metadata.create_all(self.db_engine)
+            
 
     def store_account(self, account_data: Dict[str, Any]) -> bool:
         """store or update account information"""
@@ -93,12 +93,12 @@ class MonoBankingDB:
                     for key, value in account_data.items():
                         setattr(account, key, value)
                 db.commit()
-
             return True
         except Exception as e:
             print(f"error storing account: {e}")
             return False
 
+          
     def get_account(self, account_id: str) -> Optional[Dict[str, Any]]:
         """retrieve account by id"""
         try:
@@ -124,11 +124,13 @@ class MonoBankingDB:
             print(f"error getting account: {e}")
             return None
 
+          
     def store_webhook_event(
         self, event_type: str, account_id: str, data: Dict[str, Any]
     ) -> bool:
         """store webhook event for processing"""
         try:
+
             with self.database() as db:
                 webhook_event = WebhookEvent(
                     event_type=event_type, account_id=account_id, data=json.dumps(data)
@@ -140,6 +142,7 @@ class MonoBankingDB:
             print(f"error storing webhook event: {e}")
             return False
 
+          
     def store_transactions(
         self, account_id: str, transactions: List[Dict[str, Any]]
     ) -> bool:
@@ -176,6 +179,7 @@ class MonoBankingDB:
             print(f"error storing transactions: {e}")
             return False
 
+          
     def get_recent_transactions(
         self, account_id: str, limit: int = 10
     ) -> List[Dict[str, Any]]:
@@ -209,6 +213,7 @@ class MonoBankingDB:
             print(f"error getting transactions: {e}")
             return []
 
+          
     def remove_account(self, account_id: str) -> bool:
         """remove account and related data"""
         try:

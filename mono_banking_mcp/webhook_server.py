@@ -107,8 +107,12 @@ async def handle_account_connected(data: Dict[str, Any]):
     else:
         print(f"failed to store account: {account_id}")
 
-    # store webhook event
-    db.store_webhook_event("account_connected", account_id, data)
+    # store webhook event - ensure account_id is a string
+    if account_id and isinstance(account_id, str):
+        db.store_webhook_event("account_connected", account_id, data)
+    else:
+        print(f"Invalid account_id in webhook event: {account_id}")
+
 
 
 async def handle_account_updated(data: Dict[str, Any]):
@@ -145,7 +149,12 @@ async def handle_account_unlinked(data: Dict[str, Any]):
     else:
         print(f"failed to remove account: {account_id}")
 
-    db.store_webhook_event("account_unlinked", account_id, data)
+    # store webhook event - ensure account_id is a string
+    if account_id and isinstance(account_id, str):
+        db.store_webhook_event("account_unlinked", account_id, data)
+    else:
+        print(f"Invalid account_id in webhook event: {account_id}")
+
 
 
 async def handle_job_update(data: Dict[str, Any]):
@@ -154,7 +163,10 @@ async def handle_job_update(data: Dict[str, Any]):
     job_status = data.get("status")
 
     print(f"job update for account {account_id}: {job_status}")
-    db.store_webhook_event("job_update", account_id, data)
+    if account_id and isinstance(account_id, str):
+        db.store_webhook_event("job_update", account_id, data)
+    else:
+        print(f"Invalid account_id in webhook event: {account_id}")
 
     # trigger data refresh if job finished
     if job_status == "finished":
