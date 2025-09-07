@@ -17,7 +17,11 @@ class MonoClient:
         Args:
             secret_key: Mono secret key (from app dashboard)
             base_url: Mono API base URL (same for sandbox/live, key determines environment)
+
         """
+        if not secret_key:
+            raise ValueError("Mono secret key is required")
+
         self.secret_key = secret_key
         self.base_url = base_url
         self.session = httpx.AsyncClient(
