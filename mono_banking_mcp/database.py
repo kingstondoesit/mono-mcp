@@ -130,7 +130,7 @@ class MonoBankingDB:
 
             with self.database() as db:
                 webhook_event = WebhookEvent(
-                    event_type=event_type, account_id=account_id, data=json.dumps(data)
+                    event_type=event_type, account_id=account_id, data=json.dumps(data) 
                 )
                 db.add(webhook_event)
                 db.commit()
