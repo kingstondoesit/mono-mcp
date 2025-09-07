@@ -114,7 +114,6 @@ async def handle_account_connected(data: Dict[str, Any]):
         print(f"Invalid account_id in webhook event: {account_id}")
 
 
-
 async def handle_account_updated(data: Dict[str, Any]):
     """handle account update event"""
     account_info = data.get("account", {})
@@ -154,7 +153,6 @@ async def handle_account_unlinked(data: Dict[str, Any]):
         db.store_webhook_event("account_unlinked", account_id, data)
     else:
         print(f"Invalid account_id in webhook event: {account_id}")
-
 
 
 async def handle_job_update(data: Dict[str, Any]):
