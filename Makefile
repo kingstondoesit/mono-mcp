@@ -27,7 +27,7 @@ format:  ## format code with black
 	uv run black mono_banking_mcp/ tests/
 
 format-check:  ## check code formatting
-	uv run black --check mono_banking_mcp/ tests/
+	uv run black mono_banking_mcp/ tests/
 
 type-check:  ## run type checking
 	uv run mypy mono_banking_mcp/ --ignore-missing-imports

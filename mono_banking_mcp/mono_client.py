@@ -244,7 +244,6 @@ class MonoClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError:
-
             response = await self.session.post(
                 f"{self.base_url}/v2/misc/banks/resolve", json=payload
             )

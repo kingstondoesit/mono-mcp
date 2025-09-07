@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
-from sqlalchemy import create_engine, func, inspect
+from sqlalchemy import create_engine, inspect
 
 
 class Base(DeclarativeBase):
@@ -63,7 +63,6 @@ class MonoBankingDB:
 
     def __init__(self, db_url: str, **kwargs: Any):
         try:
-
             db_engine = create_engine(db_url, **kwargs)
         except Exception as e:
             raise ValueError(
@@ -93,12 +92,11 @@ class MonoBankingDB:
                     for key, value in account_data.items():
                         setattr(account, key, value)
                 db.commit()
-
             return True
         except Exception as e:
             print(f"error storing account: {e}")
             return False
-
+          
     def get_account(self, account_id: str) -> Optional[Dict[str, Any]]:
         """retrieve account by id"""
         try:
@@ -123,15 +121,16 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error getting account: {e}")
             return None
-
+          
     def store_webhook_event(
         self, event_type: str, account_id: str, data: Dict[str, Any]
     ) -> bool:
         """store webhook event for processing"""
         try:
+
             with self.database() as db:
                 webhook_event = WebhookEvent(
-                    event_type=event_type, account_id=account_id, data=json.dumps(data)
+                    event_type=event_type, account_id=account_id, data=json.dumps(data) 
                 )
                 db.add(webhook_event)
                 db.commit()
@@ -139,7 +138,7 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error storing webhook event: {e}")
             return False
-
+          
     def store_transactions(
         self, account_id: str, transactions: List[Dict[str, Any]]
     ) -> bool:
@@ -150,23 +149,23 @@ class MonoBankingDB:
                     existing_txn = db.get(Transaction, txn.get("_id"))
                     if existing_txn:
                         existing_txn.account_id = account_id
-                        existing_txn.amount = txn.get("amount")
-                        existing_txn.type = txn.get("type")
+                        existing_txn.amount = int(txn.get("amount", 0) or 0)
+                        existing_txn.type = str(txn.get("type", ""))
                         existing_txn.description = txn.get("narration")
                         existing_txn.reference = txn.get("reference")
-                        existing_txn.date = txn.get("date")
-                        existing_txn.balance = txn.get("balance")
-                        existing_txn.category = txn.get("category")
+                        existing_txn.date = str(txn.get("date", ""))
+                        existing_txn.balance = int(txn.get("balance", 0) or 0)
+                        existing_txn.category = txn.get("category")                        
                     else:
                         transaction = Transaction(
                             id=txn.get("_id"),
                             account_id=account_id,
-                            amount=txn.get("amount"),
-                            type=txn.get("type"),
+                            amount=int(txn.get("amount", 0) or 0),
+                            type=str(txn.get("type", "")),
                             description=txn.get("narration"),
                             reference=txn.get("reference"),
-                            date=txn.get("date"),
-                            balance=txn.get("balance"),
+                            date=str(txn.get("date", "")),
+                            balance=int(txn.get("balance", 0) or 0),
                             category=txn.get("category"),
                         )
                         db.add(transaction)
@@ -175,9 +174,9 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error storing transactions: {e}")
             return False
-
+          
     def get_recent_transactions(
-        self, account_id: str, limit: int = 10
+        self, account_id: str, limit: int = 10 
     ) -> List[Dict[str, Any]]:
         """get recent transactions from database"""
         try:
