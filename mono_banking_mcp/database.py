@@ -176,7 +176,7 @@ class MonoBankingDB:
             return False
           
     def get_recent_transactions(
-        self, account_id: str, limit: int = 10
+        self, account_id: str, limit: int = 10 
     ) -> List[Dict[str, Any]]:
         """get recent transactions from database"""
         try:
