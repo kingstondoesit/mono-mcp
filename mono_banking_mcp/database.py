@@ -79,7 +79,6 @@ class MonoBankingDB:
             Base.metadata.create_all(self.db_engine)
         if "transactions" not in existing_tables:
             Base.metadata.create_all(self.db_engine)
-            
 
     def store_account(self, account_data: Dict[str, Any]) -> bool:
         """store or update account information"""
