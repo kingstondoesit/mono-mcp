@@ -3,11 +3,13 @@ import httpx
 from datetime import datetime
 from typing import Any
 
+
 class MonoClient:
     """
     Mono Open Banking API client following the official Mono API v2 specification.
     Based on Mono's official documentation and API patterns.
     """
+
     def __init__(self, secret_key: str, base_url: str = "https://api.withmono.com"):
         """
         Initialize Mono client with secret key for API authentication.
@@ -15,7 +17,11 @@ class MonoClient:
         Args:
             secret_key: Mono secret key (from app dashboard)
             base_url: Mono API base URL (same for sandbox/live, key determines environment)
+
         """
+        if not secret_key:
+            raise ValueError("Mono secret key is required")
+
         self.secret_key = secret_key
         self.base_url = base_url
         self.session = httpx.AsyncClient(
@@ -23,9 +29,9 @@ class MonoClient:
                 "mono-sec-key": secret_key,
                 "accept": "application/json",
                 "content-type": "application/json",
-                "User-Agent": "Mono-Banking-MCP/1.0"
+                "User-Agent": "Mono-Banking-MCP/1.0",
             },
-            timeout=30.0
+            timeout=30.0,
         )
 
     async def get_customer_accounts(self) -> dict[str, Any]:
@@ -49,7 +55,9 @@ class MonoClient:
         Returns:
             Dict with account balance information
         """
-        response = await self.session.get(f"{self.base_url}/v2/accounts/{account_id}/balance")
+        response = await self.session.get(
+            f"{self.base_url}/v2/accounts/{account_id}/balance"
+        )
         response.raise_for_status()
         return response.json()
 
@@ -67,7 +75,9 @@ class MonoClient:
         response.raise_for_status()
         return response.json()
 
-    async def get_account_transactions(self, account_id: str, limit: int = 50, page: int = 1) -> dict[str, Any]:
+    async def get_account_transactions(
+        self, account_id: str, limit: int = 50, page: int = 1
+    ) -> dict[str, Any]:
         """
         Get transaction history for an account.
 
@@ -80,12 +90,19 @@ class MonoClient:
             Dict with transaction history
         """
         params = {"limit": min(limit, 100), "page": page}
-        response = await self.session.get(f"{self.base_url}/v2/accounts/{account_id}/transactions", params=params)
+        response = await self.session.get(
+            f"{self.base_url}/v2/accounts/{account_id}/transactions", params=params
+        )
         response.raise_for_status()
         return response.json()
 
-    async def initiate_account_linking(self, customer_name: str, customer_email: str,
-                                     redirect_url: str, reference: str | None = None) -> dict[str, Any]:
+    async def initiate_account_linking(
+        self,
+        customer_name: str,
+        customer_email: str,
+        redirect_url: str,
+        reference: str | None = None,
+    ) -> dict[str, Any]:
         """
         Initiate account linking process to get mono_url for user authorization.
 
@@ -99,18 +116,17 @@ class MonoClient:
             Dict containing mono_url for account linking widget
         """
         payload = {
-            "customer": {
-                "name": customer_name,
-                "email": customer_email
-            },
+            "customer": {"name": customer_name, "email": customer_email},
             "scope": "auth",
-            "redirect_url": redirect_url
+            "redirect_url": redirect_url,
         }
 
         if reference:
             payload["meta"] = {"ref": reference}
 
-        response = await self.session.post(f"{self.base_url}/v2/accounts/initiate", json=payload)
+        response = await self.session.post(
+            f"{self.base_url}/v2/accounts/initiate", json=payload
+        )
         response.raise_for_status()
         return response.json()
 
@@ -125,15 +141,24 @@ class MonoClient:
             Dict containing account ID and details
         """
         payload = {"code": code}
-        response = await self.session.post(f"{self.base_url}/v2/accounts/auth", json=payload)
+        response = await self.session.post(
+            f"{self.base_url}/v2/accounts/auth", json=payload
+        )
         response.raise_for_status()
         return response.json()
 
-    async def initiate_payment(self, amount: float, payment_type: str = "onetime-debit",
-                             reference: str | None = None, redirect_url: str = "",
-                             customer_name: str = "", customer_email: str = "",
-                             customer_phone: str = "", description: str = "",
-                             account_id: str | None = None) -> dict[str, Any]:
+    async def initiate_payment(
+        self,
+        amount: float,
+        payment_type: str = "onetime-debit",
+        reference: str | None = None,
+        redirect_url: str = "",
+        customer_name: str = "",
+        customer_email: str = "",
+        customer_phone: str = "",
+        description: str = "",
+        account_id: str | None = None,
+    ) -> dict[str, Any]:
         """
         Initiate a payment using Mono DirectPay.
 
@@ -164,9 +189,9 @@ class MonoClient:
             "customer": {
                 "name": customer_name,
                 "email": customer_email,
-                "phone": customer_phone
+                "phone": customer_phone,
             },
-            "description": description
+            "description": description,
         }
 
         # Add account for split payments if provided
@@ -174,7 +199,9 @@ class MonoClient:
             payload["method"] = "account"
             payload["account"] = account_id
 
-        response = await self.session.post(f"{self.base_url}/v2/payments/initiate", json=payload)
+        response = await self.session.post(
+            f"{self.base_url}/v2/payments/initiate", json=payload
+        )
         response.raise_for_status()
         return response.json()
 
@@ -188,11 +215,15 @@ class MonoClient:
         Returns:
             Dict containing payment status and details
         """
-        response = await self.session.get(f"{self.base_url}/v2/payments/verify/{reference}")
+        response = await self.session.get(
+            f"{self.base_url}/v2/payments/verify/{reference}"
+        )
         response.raise_for_status()
         return response.json()
 
-    async def resolve_account_name(self, account_number: str, bank_code: str) -> dict[str, Any]:
+    async def resolve_account_name(
+        self, account_number: str, bank_code: str
+    ) -> dict[str, Any]:
         """
         Resolve account name for verification before payments.
         Note: This endpoint might be under /misc/banks/resolve based on guide.
@@ -204,18 +235,19 @@ class MonoClient:
         Returns:
             Dict with account name and verification status
         """
-        payload = {
-            "account_number": account_number,
-            "bank_code": bank_code
-        }
+        payload = {"account_number": account_number, "bank_code": bank_code}
 
         try:
-            response = await self.session.post(f"{self.base_url}/misc/banks/resolve", json=payload)
+            response = await self.session.post(
+                f"{self.base_url}/misc/banks/resolve", json=payload
+            )
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError:
-            
-            response = await self.session.post(f"{self.base_url}/v2/misc/banks/resolve", json=payload)
+
+            response = await self.session.post(
+                f"{self.base_url}/v2/misc/banks/resolve", json=payload
+            )
             response.raise_for_status()
             return response.json()
 
@@ -248,11 +280,15 @@ class MonoClient:
             Dict with BVN verification results
         """
         payload = {"bvn": bvn, "scope": scope}
-        response = await self.session.post(f"{self.base_url}/v2/lookup/bvn/initiate", json=payload)
+        response = await self.session.post(
+            f"{self.base_url}/v2/lookup/bvn/initiate", json=payload
+        )
         response.raise_for_status()
         return response.json()
 
-    async def lookup_account_number(self, account_number: str, nip_code: str) -> dict[str, Any]:
+    async def lookup_account_number(
+        self, account_number: str, nip_code: str
+    ) -> dict[str, Any]:
         """
         Lookup account number to get masked BVN and verification.
 
@@ -264,7 +300,9 @@ class MonoClient:
             Dict with account verification and masked BVN
         """
         payload = {"account_number": account_number, "nip_code": nip_code}
-        response = await self.session.post(f"{self.base_url}/v3/lookup/account-number", json=payload)
+        response = await self.session.post(
+            f"{self.base_url}/v3/lookup/account-number", json=payload
+        )
         response.raise_for_status()
         return response.json()
 
