@@ -10,3 +10,8 @@ __pycache__/
 /mono_banking_mcp.egg-info
 *.db
 mono_banking.db
+
+# Coverage files
+.coverage
+htmlcov/
+.coverage.*

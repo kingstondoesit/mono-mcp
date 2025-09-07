@@ -35,11 +35,9 @@ type-check:  ## run type checking
 ##@ Development
 install:  ## install dependencies
 	uv sync
-	source .venv/bin/activate
 
 install-dev:  ## install development dependencies
 	uv sync --dev
-	source .venv/bin/activate
 
 clean:  ## clean build artifacts
 	rm -rf build/
