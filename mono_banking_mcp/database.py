@@ -149,23 +149,23 @@ class MonoBankingDB:
                     existing_txn = db.get(Transaction, txn.get("_id"))
                     if existing_txn:
                         existing_txn.account_id = account_id
-                        existing_txn.amount = txn.get("amount")
-                        existing_txn.type = txn.get("type")
+                        existing_txn.amount = int(txn.get("amount", 0) or 0)
+                        existing_txn.type = str(txn.get("type", ""))
                         existing_txn.description = txn.get("narration")
                         existing_txn.reference = txn.get("reference")
-                        existing_txn.date = txn.get("date")
-                        existing_txn.balance = txn.get("balance")
-                        existing_txn.category = txn.get("category")
+                        existing_txn.date = str(txn.get("date", ""))
+                        existing_txn.balance = int(txn.get("balance", 0) or 0)
+                        existing_txn.category = txn.get("category")                        
                     else:
                         transaction = Transaction(
                             id=txn.get("_id"),
                             account_id=account_id,
-                            amount=txn.get("amount"),
-                            type=txn.get("type"),
+                            amount=int(txn.get("amount", 0) or 0),
+                            type=str(txn.get("type", "")),
                             description=txn.get("narration"),
                             reference=txn.get("reference"),
-                            date=txn.get("date"),
-                            balance=txn.get("balance"),
+                            date=str(txn.get("date", "")),
+                            balance=int(txn.get("balance", 0) or 0),
                             category=txn.get("category"),
                         )
                         db.add(transaction)
