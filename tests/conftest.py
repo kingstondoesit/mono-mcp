@@ -9,6 +9,7 @@ from mono_banking_mcp.mono_client import MonoClient
 def event_loop():
     """Create an instance of the default event loop for the test session."""
     import asyncio
+
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
@@ -17,15 +18,17 @@ def event_loop():
 @pytest.fixture
 def mock_response():
     """Standard mock response for API calls."""
+
     def _create_mock(status=True, data=None, message="Success"):
         mock = AsyncMock()
         mock.json.return_value = {
             "status": status,
             "data": data or {},
-            "message": message
+            "message": message,
         }
         mock.raise_for_status.return_value = None
         return mock
+
     return _create_mock
 
 
@@ -37,12 +40,9 @@ def sample_account_data():
         "name": "John Doe",
         "accountNumber": "1234567890",
         "type": "SAVINGS",
-        "institution": {
-            "name": "GTBank",
-            "bankCode": "058"
-        },
+        "institution": {"name": "GTBank", "bankCode": "058"},
         "balance": 500000,
-        "currency": "NGN"
+        "currency": "NGN",
     }
 
 
@@ -56,16 +56,16 @@ def sample_transaction_data():
             "type": "debit",
             "narration": "ATM Withdrawal",
             "date": "2024-01-15",
-            "balance": 490000
+            "balance": 490000,
         },
         {
-            "_id": "txn2", 
+            "_id": "txn2",
             "amount": 50000,
             "type": "credit",
             "narration": "Salary Payment",
             "date": "2024-01-01",
-            "balance": 500000
-        }
+            "balance": 500000,
+        },
     ]
 
 
@@ -76,7 +76,7 @@ def sample_banks_data():
         {"name": "Access Bank", "code": "044", "slug": "access-bank"},
         {"name": "GTBank", "code": "058", "slug": "gtbank"},
         {"name": "First Bank", "code": "011", "slug": "first-bank"},
-        {"name": "Zenith Bank", "code": "057", "slug": "zenith-bank"}
+        {"name": "Zenith Bank", "code": "057", "slug": "zenith-bank"},
     ]
 
 
@@ -92,16 +92,16 @@ def setup_test_environment():
     test_env = {
         "MONO_SECRET_KEY": "test_secret_key",
         "MONO_BASE_URL": "https://api.withmono.com",
-        "MONO_ENVIRONMENT": "test"
+        "MONO_ENVIRONMENT": "test",
     }
-    
+
     original_env = {}
     for key, value in test_env.items():
         original_env[key] = os.environ.get(key)
         os.environ[key] = value
-    
+
     yield
-    
+
     for key, original_value in original_env.items():
         if original_value is None:
             os.environ.pop(key, None)
