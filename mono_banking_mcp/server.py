@@ -1,10 +1,19 @@
 """Mono Banking MCP Server using FastMCP."""
 
 import os
+import hmac
+import hashlib
+import json
+from typing import Dict, Any
 
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 from mono_banking_mcp.mono_client import MonoClient
+from mono_banking_mcp.database import MonoBankingDB
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from starlette.exceptions import HTTPException
+from decouple import config as decouple_config
 
 load_dotenv()
 
@@ -14,6 +23,13 @@ mono_client = MonoClient(
     secret_key=os.getenv("MONO_SECRET_KEY", ""),
     base_url=os.getenv("MONO_BASE_URL", "https://api.withmono.com"),
 )
+
+# Initialize database for webhook events
+db_url = decouple_config("DATABASE_URL", default="sqlite:///./mono_banking.db")
+db = MonoBankingDB(db_url=db_url)
+
+# Get webhook secret from environment
+WEBHOOK_SECRET = os.getenv("MONO_WEBHOOK_SECRET")
 
 
 @mcp.tool()
@@ -396,6 +412,178 @@ async def initiate_account_linking(
                 "error": result.get("message", "Account linking initiation failed"),
             }
 
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# Webhook functionality integrated into FastMCP server
+def verify_webhook_signature(payload: bytes, signature: str) -> bool:
+    """Verify webhook signature using HMAC-SHA256"""
+    if not WEBHOOK_SECRET:
+        return False
+
+    if not signature:
+        return False
+
+    expected_signature = hmac.new(
+        WEBHOOK_SECRET.encode(), payload, hashlib.sha256
+    ).hexdigest()
+
+    # Ensure both signatures are the same length to prevent timing attacks
+    if len(signature) != len(expected_signature):
+        return False
+
+    return hmac.compare_digest(signature, expected_signature)
+
+
+async def handle_account_connected(data: Dict[str, Any]):
+    """Handle account connection event"""
+    account_id = data.get("id")
+    customer_id = data.get("customer")
+
+    # Store account in database
+    account_data = {"id": account_id, "customer_id": customer_id, "status": "connected"}
+
+    if db.store_account(account_data):
+        print(f"Account connected and stored: {account_id}")
+    else:
+        print(f"Failed to store account: {account_id}")
+
+    # Store webhook event - ensure account_id is a string
+    if account_id and isinstance(account_id, str):
+        db.store_webhook_event("account_connected", account_id, data)
+    else:
+        print(f"Invalid account_id in webhook event: {account_id}")
+
+
+async def handle_account_updated(data: Dict[str, Any]):
+    """Handle account update event"""
+    account_info = data.get("account", {})
+    account_id = account_info.get("id")
+    meta = data.get("meta", {})
+    data_status = meta.get("data_status")
+
+    # Update account status in database
+    existing_account = db.get_account(account_id)
+    if existing_account:
+        existing_account.update(
+            {
+                "status": data_status,
+                "bank_name": account_info.get("institution", {}).get("name"),
+                "bank_code": account_info.get("institution", {}).get("bankCode"),
+            }
+        )
+        db.store_account(existing_account)
+
+    print(f"Account updated: {account_id}, status: {data_status}")
+    db.store_webhook_event("account_updated", account_id, data)
+
+
+async def handle_account_unlinked(data: Dict[str, Any]):
+    """Handle account unlink event"""
+    account_info = data.get("account", {})
+    account_id = account_info.get("id")
+
+    # Remove account from database
+    if db.remove_account(account_id):
+        print(f"Account unlinked and removed: {account_id}")
+    else:
+        print(f"Failed to remove account: {account_id}")
+
+    # Store webhook event - ensure account_id is a string
+    if account_id and isinstance(account_id, str):
+        db.store_webhook_event("account_unlinked", account_id, data)
+    else:
+        print(f"Invalid account_id in webhook event: {account_id}")
+
+
+async def handle_job_update(data: Dict[str, Any]):
+    """Handle job status update"""
+    account_id = data.get("account")
+    job_status = data.get("status")
+
+    print(f"Job update for account {account_id}: {job_status}")
+    if account_id and isinstance(account_id, str):
+        db.store_webhook_event("job_update", account_id, data)
+    else:
+        print(f"Invalid account_id in webhook event: {account_id}")
+
+    # Trigger data refresh if job finished
+    if job_status == "finished":
+        print(f"Job finished for account {account_id} - ready for data sync")
+
+
+@mcp.custom_route("/mono/webhook", methods=["POST"])
+async def handle_webhook(request: Request):
+    """Handle incoming Mono webhook events"""
+    try:
+        # Get raw payload for signature verification
+        payload = await request.body()
+
+        # Verify webhook signature
+        signature = request.headers.get("mono-webhook-secret", "")
+        if not verify_webhook_signature(payload, signature):
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid webhook signature",
+            )
+
+        # Parse JSON payload
+        try:
+            event_data = json.loads(payload.decode())
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+        event_type = event_data.get("event")
+        data = event_data.get("data", {})
+
+        # Handle different webhook events
+        if event_type == "mono.events.account_connected":
+            await handle_account_connected(data)
+        elif event_type == "mono.events.account_updated":
+            await handle_account_updated(data)
+        elif event_type == "mono.events.account_unlinked":
+            await handle_account_unlinked(data)
+        elif event_type == "mono.accounts.jobs.update":
+            await handle_job_update(data)
+        else:
+            print(f"Unknown webhook event: {event_type}")
+
+        return JSONResponse({"status": "success"}, status_code=200)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Webhook error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error",
+        )
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request):
+    """Health check endpoint"""
+    return JSONResponse(
+        {
+            "status": "healthy",
+            "service": "mono-banking-mcp",
+            "webhook_configured": WEBHOOK_SECRET is not None,
+        }
+    )
+
+
+@mcp.tool()
+async def get_webhook_events(account_id: str = None, limit: int = 10) -> dict:
+    """Get recent webhook events for debugging and monitoring."""
+    try:
+        events = db.get_webhook_events(account_id=account_id, limit=limit)
+        return {
+            "success": True,
+            "events": events,
+            "count": len(events),
+            "account_id": account_id,
+        }
     except Exception as e:
         return {"success": False, "error": str(e)}
 

@@ -93,6 +93,8 @@ def setup_test_environment():
         "MONO_SECRET_KEY": "test_secret_key",
         "MONO_BASE_URL": "https://api.withmono.com",
         "MONO_ENVIRONMENT": "test",
+        "MONO_WEBHOOK_SECRET": "test_webhook_secret",
+        "DATABASE_URL": "sqlite:///:memory:",
     }
 
     original_env = {}

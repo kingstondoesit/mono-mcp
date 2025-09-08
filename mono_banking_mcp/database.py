@@ -96,7 +96,7 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error storing account: {e}")
             return False
-          
+
     def get_account(self, account_id: str) -> Optional[Dict[str, Any]]:
         """retrieve account by id"""
         try:
@@ -121,7 +121,7 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error getting account: {e}")
             return None
-          
+
     def store_webhook_event(
         self, event_type: str, account_id: str, data: Dict[str, Any]
     ) -> bool:
@@ -130,7 +130,7 @@ class MonoBankingDB:
 
             with self.database() as db:
                 webhook_event = WebhookEvent(
-                    event_type=event_type, account_id=account_id, data=json.dumps(data) 
+                    event_type=event_type, account_id=account_id, data=json.dumps(data)
                 )
                 db.add(webhook_event)
                 db.commit()
@@ -138,7 +138,7 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error storing webhook event: {e}")
             return False
-          
+
     def store_transactions(
         self, account_id: str, transactions: List[Dict[str, Any]]
     ) -> bool:
@@ -155,7 +155,7 @@ class MonoBankingDB:
                         existing_txn.reference = txn.get("reference")
                         existing_txn.date = str(txn.get("date", ""))
                         existing_txn.balance = int(txn.get("balance", 0) or 0)
-                        existing_txn.category = txn.get("category")                        
+                        existing_txn.category = txn.get("category")
                     else:
                         transaction = Transaction(
                             id=txn.get("_id"),
@@ -174,9 +174,9 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error storing transactions: {e}")
             return False
-          
+
     def get_recent_transactions(
-        self, account_id: str, limit: int = 10 
+        self, account_id: str, limit: int = 10
     ) -> List[Dict[str, Any]]:
         """get recent transactions from database"""
         try:
@@ -229,3 +229,33 @@ class MonoBankingDB:
         except Exception as e:
             print(f"error removing account: {e}")
             return False
+
+    def get_webhook_events(
+        self, account_id: Optional[str] = None, limit: int = 10
+    ) -> List[Dict[str, Any]]:
+        """Get recent webhook events for debugging and monitoring"""
+        try:
+            with self.database() as db:
+                query = db.query(WebhookEvent)
+
+                if account_id:
+                    query = query.filter(WebhookEvent.account_id == account_id)
+
+                events = (
+                    query.order_by(WebhookEvent.created_at.desc()).limit(limit).all()
+                )
+
+                return [
+                    {
+                        "id": event.id,
+                        "event_type": event.event_type,
+                        "account_id": event.account_id,
+                        "data": json.loads(event.data) if event.data else {},
+                        "processed": event.processed,
+                        "created_at": event.created_at.isoformat(),
+                    }
+                    for event in events
+                ]
+        except Exception as e:
+            print(f"Error getting webhook events: {e}")
+            return []

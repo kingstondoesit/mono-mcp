@@ -1,36 +1,44 @@
 # Mono Banking MCP Server
 
-A comprehensive **Model Context Protocol (MCP)** server for Nigerian banking operations using the [Mono Open Banking API](https://mono.co).
+[![Try on FastMCP Cloud](https://img.shields.io/badge/Try%20on-FastMCP%20Cloud-blue?style=for-the-badge&logo=cloud&logoColor=white)](https://mono-banking-mcp.fastmcp.app/mcp)
+
+A comprehensive **Model Context Protocol (MCP)** server for Nigerian banking operations using the [Mono Open Banking API](https://mono.co). Features integrated webhook support for real-time banking events and seamless deployment on FastMCP Cloud.
 
 ## Table of Contents
 
 - [Key Features](#-key-features)
-- [Architecture](#-architecture)
+- [Architecture](#️-architecture)
 - [Technologies Used](#️-technologies-used)
 - [Project Structure](#-project-structure)
-- [Installation and Setup](#-installation-and-setup)
+- [Webhook Integration](#-webhook-integration)
+- [Quick Start](#-quick-start)
 - [Usage](#-usage)
 - [Available Banking Tools](#️-available-banking-tools)
-- [Development](#-development)
 - [Contributing](#-contributing)
 
 ## Key Features
 
-Complete Nigerian banking operations through AI assistants with account management, real-time payments, BVN verification, and secure webhook integration via the Model Context Protocol (MCP).
+- **Complete Banking Operations** - Account management, payments, BVN verification
+- **Real-time Webhooks** - Integrated webhook endpoints for live banking events
+- **AI Assistant Ready** - Seamless integration with Claude, ChatGPT, and other AI assistants
+- **Cloud Deployment** - Ready for FastMCP Cloud with automatic scaling
+- **Enterprise Security** - HMAC signature verification and secure API handling
+- **Event Monitoring** - Built-in webhook event storage and debugging tools
 
 ## Architecture
 
 ```mermaid
 sequenceDiagram
-    participant User as - User
-    participant AI as - AI Assistant<br/>(Claude/Gemini)
-    participant MCP as - MCP Server<br/>(FastMCP)
-    participant Client as - Mono Client<br/>(httpx)
-    participant API as - Mono API<br/>(Nigerian Banks)
+    participant User as 👤 User
+    participant AI as 🤖 AI Assistant<br/>(Claude/ChatGPT)
+    participant MCP as ⚡ MCP Server<br/>(FastMCP + Webhooks)
+    participant Client as 🔗 Mono Client<br/>(httpx)
+    participant API as 🏦 Mono API<br/>(Nigerian Banks)
+    participant Webhook as 📡 Webhook Events
 
     User->>AI: "Check my account balance"
     AI->>MCP: list_tools()
-    MCP-->>AI: Available banking tools
+    MCP-->>AI: 12 banking tools + webhook monitoring
 
     AI->>MCP: get_account_balance(account_id)
     MCP->>Client: get_account_balance(account_id)
@@ -39,13 +47,20 @@ sequenceDiagram
     Client-->>MCP: Account balance data
     MCP-->>AI: {"success": true, "balance": "₦500.00"}
     AI-->>User: "Your account balance is ₦500.00"
+
+    Note over Webhook,MCP: Real-time Events
+    API->>MCP: POST /mono/webhook (account.updated)
+    MCP->>MCP: Verify HMAC signature
+    MCP->>MCP: Store event in database
 ```
 
 ## Technologies Used
 
 - **Python 3.12+** - Modern Python with async/await support
-- **FastMCP** - Simplified MCP server implementation with decorators
+- **FastMCP 2.12+** - Simplified MCP server with custom route support
+- **Starlette** - ASGI framework for webhook endpoints
 - **httpx** - Modern async HTTP client for API communication
+- **SQLAlchemy** - Database ORM for webhook event storage
 - **Mono Open Banking API v2** - Nigerian banking infrastructure
 - **python-dotenv** - Environment variable management
 - **uv** - Fast Python package manager (recommended)
@@ -53,99 +68,76 @@ sequenceDiagram
 ## Project Structure
 
 ```
-mono-mcp/
+mono-banking-mcp/
 ├── mono_banking_mcp/           # Main package
-│   ├── server.py                 # FastMCP server with 11 banking tools
+│   ├── server.py                 # FastMCP server with 12 tools + webhook endpoints
 │   ├── mono_client.py            # Mono API client with async httpx
-│   ├── webhook_server.py         # FastAPI webhook server for real-time events
-│   └── database.py               # SQLite database for webhook events storage
-├── tests/                     # Comprehensive test suite
-├── .vscode/                   # VS Code configuration
-│   └── mcp-config.json           # MCP integration configuration
+│   └── database.py               # SQLAlchemy database for webhook events storage
+├── tests/                     # Comprehensive test suite with webhook integration tests
+│   ├── conftest.py               # Test configuration and fixtures
+│   └── test_mono_banking.py      # Unit and integration tests
 ├── pyproject.toml            # Modern Python project configuration (uv-based)
-├── uv.lock                   # Dependency lock file (225 packages locked)
+├── uv.lock                   # Dependency lock file with FastMCP 2.12+
 ├── pytest.ini               # Test configuration and markers
-├── Makefile                  # Development workflow automation
-├── claude_desktop_config.json # Claude Desktop MCP integration
-├── .env.example              # Environment variables template
+├── Makefile                  # Development workflow automation with webhook commands
 ├── README.md                 # This comprehensive documentation
-└── .gitignore                # Git ignore rules
+└── .env.example              # Environment variables template
 ```
 
-## Installation and Setup
+## Webhook Integration
 
-### Prerequisites
+### Real-time Event Processing
 
-- **Python 3.12+** - Modern Python with async/await support
-- **[uv](https://docs.astral.sh/uv/)** - Fast Python package manager (recommended)
-- **Mono API credentials** - Get them at [mono.co](https://mono.co)
+The server includes integrated webhook support for real-time banking events:
 
-### Step 1: Get Mono API Credentials
-
-1. **Sign up & KYC**: Create an account on the [Mono Dashboard](https://app.withmono.com) and complete KYC verification
-2. **Create an App**: Go to **Apps** → **Create app** and choose product scopes:
-   - **Connect**: For account linking and data access
-   - **Payments**: For DirectPay transactions
-3. **Obtain API Keys**: Copy your **Secret Key** and **Public Key** from the dashboard
-4. **Configure Webhooks** (optional): Set up webhook URLs for real-time events
-
-### Step 2: Project Setup
-
-1. **Clone and setup the project:**
-   ```bash
-   git clone <your-repo-url>
-   cd mono-mcp
-   ```
-
-2. **Install dependencies using uv (recommended):**
-   ```bash
-   # Install all dependencies (runtime + development)
-   uv sync
-   
-   # Alternative: Install the package directly
-   uv pip install -e ".[dev]"
-   ```
-
-   **Or using pip (if uv is not available):**
-   ```bash
-   pip install -e ".[dev]"
-   ```
-
-3. **Configure environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your Mono API credentials
-   ```
-
-### Step 3: Environment Configuration
-
-Create a `.env` file with your Mono credentials:
-
-```env
-MONO_SECRET_KEY=your_actual_mono_secret_key_here
-MONO_PUBLIC_KEY=your_mono_public_key_here
-MONO_WEBHOOK_SECRET=your_webhook_secret_here
-MONO_BASE_URL=https://api.withmono.com
-MONO_ENVIRONMENT=sandbox  # or 'production'
-DATABASE_URL=postgres or mysql or just leave it out to use sqlite as default
+```mermaid
+graph LR
+    A[Mono API] -->|POST /mono/webhook| B[FastMCP Server]
+    B -->|HMAC Verify| C[Signature Check]
+    C -->|✅ Valid| D[Store Event]
+    C -->|❌ Invalid| E[Reject]
+    D --> F[SQLite Database]
+    F --> G[get_webhook_events Tool]
+    G --> H[AI Assistant]
 ```
+
+###  Key Integration Points
+
+- **`/mono/webhook`** - Webhook endpoint for real-time Mono events
+- **`/health`** - Health check endpoint for monitoring
+
+### Supported Webhook Events
+
+- **`account.connected`** - New account linked
+- **`account.updated`** - Account information changed
+- **`account.unlinked`** - Account disconnected
+- **`job.completed`** - Data sync completed
+- **`job.failed`** - Data sync failed
+
+### Security Features
+
+- **HMAC-SHA256 Signature Verification** - Ensures webhook authenticity
+- **Environment-based Secrets** - Secure credential management
+- **Request Validation** - Malformed request rejection
+- **Event Storage** - Audit trail for all webhook events
+
+## Quick Start
+
+**Ready to use immediately!** Connect your AI assistant to:
+
+[![Try on FastMCP Cloud](https://img.shields.io/badge/Try%20Now-FastMCP%20Cloud-blue?style=for-the-badge&logo=cloud&logoColor=white)](https://mono-banking-mcp.fastmcp.app/mcp)
+
+```
+https://mono-banking-mcp.fastmcp.app/mcp
+```
+
+### Available Endpoints
+
+- **MCP Server**: `https://mono-banking-mcp.fastmcp.app/mcp`
+- **Webhook Endpoint**: `https://mono-banking-mcp.fastmcp.app/mono/webhook`
+- **Health Check**: `https://mono-banking-mcp.fastmcp.app/health`
 
 ## Usage
-
-### Standalone Server
-
-Run the MCP server directly (ensure the package is installed first):
-
-```bash
-# Install the package if not already done
-uv pip install -e .
-
-# Run the server
-python -m mono_banking_mcp.server
-
-# Or with environment variables
-MONO_SECRET_KEY=your_key python -m mono_banking_mcp.server
-```
 
 ### Claude Desktop Integration
 
@@ -155,21 +147,12 @@ Add to your Claude Desktop configuration (`~/.config/claude-desktop/config.json`
 {
   "mcpServers": {
     "mono-banking": {
-      "command": "uv",
-      "args": ["run", "python", "-m", "mono_banking_mcp.server"],
-      "cwd": "/path/to/mono-banking-mcp",
-      "env": {
-        "MONO_SECRET_KEY": "your_actual_mono_secret_key_here",
-        "MONO_BASE_URL": "https://api.withmono.com"
-      }
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch", "https://mono-banking-mcp.fastmcp.app/mcp"]
     }
   }
 }
 ```
-
-### VS Code / GitHub Copilot Integration
-
-The project includes VS Code configuration files in `.vscode/` for seamless integration with GitHub Copilot's MCP support.
 
 ### Usage Examples
 
@@ -199,8 +182,9 @@ Once connected to an AI assistant (Claude, Gemini, etc.), you can use natural la
 
 ## Available Banking Tools
 
-The server provides these comprehensive banking tools (11 total):
+The server provides these comprehensive banking tools (**12 total**):
 
+### Core Banking Operations
 | Tool | Description | Parameters |
 |------|-------------|------------|
 | `list_linked_accounts` | List all linked bank accounts | None |
@@ -215,120 +199,32 @@ The server provides these comprehensive banking tools (11 total):
 | `lookup_bvn` | Perform BVN identity verification | `bvn`, `scope` |
 | `initiate_account_linking` | Start account linking process for new customers | `customer_name`, `customer_email` |
 
-## Development
-
-### Quick Start
-```bash
-# Clone and setup
-git clone <your-repo-url>
-cd mono-mcp
-
-# Install dependencies and package in development mode
-uv sync
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your Mono API key
-
-# Run server to test
-uv run python -m mono_banking_mcp.server
-```
-
-### Development Workflow (Makefile Commands)
-```bash
-# Run the complete developer workflow:
-make help           # Show all available commands
-
-# Testing
-make test           # Run unit tests with coverage
-make test-unit      # Run only unit tests  
-make test-integration  # Run integration tests (requires MONO_SECRET_KEY)
-make test-performance  # Run performance tests
-make test-all       # Run all tests including integration
-
-# Code Quality
-make lint           # Run ruff linting
-make format         # Format code with black
-make format-check   # Check code formatting
-make type-check     # Run mypy type checking
-
-# Full CI Pipeline
-make ci             # Run complete CI pipeline locally
-
-# Development
-make install        # Install dependencies
-make clean          # Clean build artifacts
-
-# MCP Server Operations
-make server         # Run MCP server for testing
-make server-debug   # Run with debug logging
-make tools          # List all available MCP tools
-```
-
-**Test Categories:**
-```bash
-# Fast development tests (default)
-make test              # Only unit tests
-
-# Full test suite
-make test-all         # All tests including integration
-
-# Selective testing  
-uv run pytest -m "not integration"     # Skip tests requiring API keys
-uv run pytest -m "performance"         # Only performance tests
-```
-
-# Test MCP server initialization
-
-```python
-python -c "
-import asyncio
-from mono_banking_mcp.server import mcp
-
-async def test_tools():
-    tools = await mcp.list_tools()
-    print(f' Successfully loaded {len(tools)} MCP tools')
-    for tool in tools:
-        print(f'  - {tool.name}')
-
-asyncio.run(test_tools())
-"
-```
-
-### Code Quality
-```bash
-# All dev tools available after uv sync
-
-# Format code
-black mono_banking_mcp/ tests/
-
-# Lint code
-ruff check mono_banking_mcp/ tests/
-
-# Type checking
-mypy mono_banking_mcp/ --ignore-missing-imports
-```
-
 ## Contributing
 
-Contributions to the Mono Banking MCP Server are welcome! For questions or help getting started, please open an issue. 
+Contributions to the Mono Banking MCP Server are welcome! For questions or help getting started, please open an issue.
+
+### Development Workflow
 
 **Quick Start for Contributors:**
 ```bash
 # Fork and clone the repository
-git clone https://github.com/YOUR_USERNAME/mono-mcp.git
-cd mono-mcp
+git clone https://github.com/YOUR_USERNAME/mono-banking-mcp.git
+cd mono-banking-mcp
 
 # Set up development environment
 uv sync
 uv pip install -e .
 
-# Verify installation
-python -c "from mono_banking_mcp.server import mcp; print('Package installed successfully')"
+# Verify installation with webhook support
+python -c "from mono_banking_mcp.server import mcp; print('✅ Package installed successfully')"
+
+# Run comprehensive tests
+make test-all
 
 # Create feature branch and start developing
 git checkout -b feature/your-feature-name
 
-# Run tests before making changes
-pytest tests/ -v
+# Test your changes
+make test-webhook  # Test webhook functionality
+make tools         # Verify all 12 tools are working
 ```

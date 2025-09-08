@@ -27,7 +27,7 @@ format:  ## format code with black
 	uv run black mono_banking_mcp/ tests/
 
 format-check:  ## check code formatting
-	uv run black mono_banking_mcp/ tests/
+	uv run black --check mono_banking_mcp/ tests/
 
 type-check:  ## run type checking
 	uv run mypy mono_banking_mcp/ --ignore-missing-imports
@@ -72,4 +72,10 @@ server-debug:  ## run MCP server with debug logging
 	uv run python -c "import logging; logging.basicConfig(level=logging.DEBUG); from mono_banking_mcp.server import main; main()"
 
 tools:  ## list available MCP tools
-	uv run python -c "import asyncio; from mono_banking_mcp.server import mcp; print('Available tools:'); [print(f'- {tool.name}: {tool.description}') for tool in asyncio.run(mcp.list_tools())]"
+	MONO_SECRET_KEY=test_key MONO_WEBHOOK_SECRET=test_webhook_secret uv run python -c "import asyncio; from mono_banking_mcp.server import mcp; print('Available tools:'); [print(f'- {tool.name}: {tool.description}') for tool in asyncio.run(mcp._list_tools())]"
+
+test-webhook:  ## test webhook functionality specifically
+	uv run pytest tests/ -v -k "webhook" --tb=short
+
+server-webhook:  ## run server with webhook endpoints enabled
+	MONO_SECRET_KEY=test_key MONO_WEBHOOK_SECRET=test_webhook_secret uv run python -m mono_banking_mcp.server

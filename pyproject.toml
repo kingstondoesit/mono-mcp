@@ -11,13 +11,14 @@ authors = [{name = "Your Name", email = "your.email@example.com"}]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastmcp==2.11.3",
+    "fastmcp>=2.12.0",
     "httpx>=0.25.0",
     "python-dotenv>=1.0.0",
     "fastapi>=0.104.0",
     "uvicorn>=0.24.0",
     "python-decouple>=3.8",
     "sqlalchemy>=2.0.43",
+    "starlette>=0.40.0",
 ]
 
 
